@@ -2,23 +2,22 @@ import { Injectable } from '@nestjs/common';
 import { supabase } from 'supabase/server';
 import { BadRequest } from 'http-errors';
 
+import { throwError } from 'src/helpers/throwError';
+import { AuthSignInDto, AuthSignUpDto } from 'src/auth/dto/auth.dto';
+
 @Injectable()
 export class AuthService {
-  async signUp(data: {
-    email: string;
-    password: string;
-    confirmPassword: string;
-  }) {
+  public async signUp(dto: AuthSignUpDto): Promise<any> {
     try {
-      if (data.password !== data.confirmPassword)
+      if (dto.password !== dto.confirmPassword)
         throw new BadRequest(`Confirm password doesn't match password`);
 
       const { data: response, error } = await supabase.auth.signUp({
-        email: data.email,
-        password: data.password,
+        email: dto.email,
+        password: dto.password,
       });
 
-      if (error) return { statusCode: error.status, message: error.message };
+      if (error) throwError({ error });
 
       return {
         data: {
@@ -35,14 +34,14 @@ export class AuthService {
     }
   }
 
-  async signIn(data: { email: string; password: string }) {
+  public async signIn(dto: AuthSignInDto): Promise<any> {
     try {
       const { data: response, error } = await supabase.auth.signInWithPassword({
-        email: data.email,
-        password: data.password,
+        email: dto.email,
+        password: dto.password,
       });
 
-      if (error) return { statusCode: error.status, message: error.message };
+      if (error) throwError({ error });
 
       return {
         data: {
