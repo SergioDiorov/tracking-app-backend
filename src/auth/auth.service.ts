@@ -4,9 +4,12 @@ import { BadRequest } from 'http-errors';
 
 import { throwError } from 'src/helpers/throwError';
 import { AuthSignInDto, AuthSignUpDto } from 'src/auth/dto/auth.dto';
+import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()
 export class AuthService {
+  constructor(private readonly prisma: PrismaService) { }
+
   public async signUp(dto: AuthSignUpDto): Promise<any> {
     try {
       if (dto.password !== dto.confirmPassword)
@@ -18,6 +21,19 @@ export class AuthService {
       });
 
       if (error) throwError({ error });
+
+      await this.prisma.profile.create({
+        data: {
+          userId: response.user.id,
+          firstName: dto.firstName,
+          lastName: dto.lastName,
+          age: dto.age,
+          country: dto.country,
+          city: dto.city,
+          workPreference: dto.workPreference,
+        },
+      });
+
 
       return {
         data: {
