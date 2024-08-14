@@ -10,7 +10,7 @@ datasource db {
 
 model Profile {
   id             String     @id @default(uuid()) 
-  userId         String
+  userId         String     @unique
   firstName      String
   lastName       String
   age            String
