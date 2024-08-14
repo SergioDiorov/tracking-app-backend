@@ -1,16 +1,24 @@
 import { Module, ValidationPipe } from '@nestjs/common';
-import { APP_PIPE } from '@nestjs/core';
+import { PassportModule } from '@nestjs/passport';
+import { APP_PIPE, APP_GUARD } from '@nestjs/core';
+import { ConfigModule } from '@nestjs/config';
 
+import { SupabaseGuard } from 'src/auth/supabase/supabase.guard';
+import { PrismaService } from 'src/prisma/prisma.service';
+import { SupabaseModule } from 'src/auth/supabase/supabase.module';
 import { AuthModule } from 'src/auth/auth.module';
 import { UsersModule } from 'src/users/users.module';
-import { PrismaService } from 'src/prisma/prisma.service';
 
 @Module({
-  imports: [AuthModule, UsersModule],
+  imports: [ConfigModule.forRoot(), PassportModule, SupabaseModule, AuthModule, UsersModule],
   providers: [
     {
       provide: APP_PIPE,
       useClass: ValidationPipe,
+    },
+    {
+      provide: APP_GUARD,
+      useClass: SupabaseGuard,
     },
     PrismaService
   ],

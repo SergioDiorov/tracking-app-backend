@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { supabase } from 'supabase/server';
+import { Supabase } from 'src/auth/supabase/supabase';
 import { BadRequest } from 'http-errors';
 
 import { throwError } from 'src/helpers/throwError';
@@ -8,13 +8,14 @@ import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()
 export class AuthService {
-  constructor(private readonly prisma: PrismaService) { }
+  constructor(private readonly prisma: PrismaService, private readonly supabase: Supabase,) { }
 
   public async signUp(dto: AuthSignUpDto): Promise<any> {
     try {
       if (dto.password !== dto.confirmPassword)
         throw new BadRequest(`Confirm password doesn't match password`);
 
+      const supabase = this.supabase.getClient();
       const { data: response, error } = await supabase.auth.signUp({
         email: dto.email,
         password: dto.password,
@@ -52,6 +53,7 @@ export class AuthService {
 
   public async signIn(dto: AuthSignInDto): Promise<any> {
     try {
+      const supabase = this.supabase.getClient();
       const { data: response, error } = await supabase.auth.signInWithPassword({
         email: dto.email,
         password: dto.password,
