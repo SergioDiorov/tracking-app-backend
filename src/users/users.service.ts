@@ -23,31 +23,39 @@ export class UsersService {
     }
   }
 
-  public async uploadFile(file: Express.Multer.File): Promise<any> {
+  public async uploadFile({ file, userId }: { file: Express.Multer.File, userId: string }): Promise<any> {
     try {
       const supabaseClient = this.supabase.getClient();
       const { data, error } = await supabaseClient.storage
         .from('avatars')
         .upload(`avatar_${Date.now()}.png`, file.buffer, {
           contentType: file.mimetype,
+          upsert: false
         });
 
       if (error) {
         throw new Error(error.message);
       }
-      console.log(data);
 
-      // const { publicURL, error: publicUrlError } = supabase.storage
-      //   .from('avatars')
-      //   .getPublicUrl(`avatar_${file.originalname}`);
+      const { data: urlAvatarData, error: imageError } = await supabaseClient
+        .storage
+        .from('avatars')
+        .createSignedUrl(data.path, 60 * 60 * 24 * 365 * 5)
 
-      // if (publicUrlError) {
-      //   throw new Error(publicUrlError.message);
-      // }
+      if (imageError) {
+        throw new Error(imageError.message);
+      }
+
+      await this.prisma.profile.update({
+        where: { userId },
+        data: { avatar: urlAvatarData.signedUrl },
+      });
 
       return {
-        message: 'File uploaded successfully!',
-        data,
+        data: {
+          avatarUrl: urlAvatarData.signedUrl,
+        },
+        message: 'Avatar uploaded successfully!',
       };
     } catch (error) {
       throw new Error(`Failed to upload file: ${error.message}`);

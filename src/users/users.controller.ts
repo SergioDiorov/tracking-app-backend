@@ -12,16 +12,18 @@ export class UsersController {
     return this.usersService.getUserProfile(userId);
   }
 
-  @Post('avatar')
+  @Post(':userId/avatar')
   @UseInterceptors(FileInterceptor('file'))
-  uploadFile(@UploadedFile(
-    new ParseFilePipe({
-      validators: [
-        new FileTypeValidator({ fileType: '.(png|jpeg|jpg)' }),
-        new MaxFileSizeValidator({ maxSize: 1024 * 1024 * 4 }),
-      ],
-    }),
-  ) file: Express.Multer.File) {
-    return this.usersService.uploadFile(file)
+  uploadFile(
+    @Param('userId') userId: string,
+    @UploadedFile(
+      new ParseFilePipe({
+        validators: [
+          new FileTypeValidator({ fileType: '.(png|jpeg|jpg)' }),
+          new MaxFileSizeValidator({ maxSize: 1024 * 1024 * 4 }),
+        ],
+      }),
+    ) file: Express.Multer.File) {
+    return this.usersService.uploadFile({ userId, file })
   }
 }

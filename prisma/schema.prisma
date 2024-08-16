@@ -17,4 +17,5 @@ model Profile {
   country        String
   city           String
   workPreference String
+  avatar         String? 
 }
