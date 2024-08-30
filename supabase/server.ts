@@ -4,4 +4,7 @@ import { ConfigModule } from '@nestjs/config';
 
 ConfigModule.forRoot();
 
-export const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_ANON_KEY);
+export const supabase = createClient(
+  process.env.SUPABASE_URL,
+  process.env.SUPABASE_ANON_KEY,
+);

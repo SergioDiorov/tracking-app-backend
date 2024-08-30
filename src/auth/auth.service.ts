@@ -1,24 +1,40 @@
 import { Injectable } from '@nestjs/common';
-import { supabase } from 'supabase/server';
+import { Supabase } from 'src/auth/supabase/supabase';
 import { BadRequest } from 'http-errors';
+
+import { throwError } from 'src/helpers/throwError';
+import { AuthSignInDto, AuthSignUpDto } from 'src/auth/dto/auth.dto';
+import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()
 export class AuthService {
-  async signUp(data: {
-    email: string;
-    password: string;
-    confirmPassword: string;
-  }) {
+  constructor(private readonly prisma: PrismaService, private readonly supabase: Supabase,) { }
+
+  public async signUp(dto: AuthSignUpDto): Promise<any> {
     try {
-      if (data.password !== data.confirmPassword)
+      if (dto.password !== dto.confirmPassword)
         throw new BadRequest(`Confirm password doesn't match password`);
 
+      const supabase = this.supabase.getClient();
       const { data: response, error } = await supabase.auth.signUp({
-        email: data.email,
-        password: data.password,
+        email: dto.email,
+        password: dto.password,
       });
 
-      if (error) return { statusCode: error.status, message: error.message };
+      if (error) throwError({ error });
+
+      await this.prisma.profile.create({
+        data: {
+          userId: response.user.id,
+          firstName: dto.firstName,
+          lastName: dto.lastName,
+          age: dto.age,
+          country: dto.country,
+          city: dto.city,
+          workPreference: dto.workPreference,
+        },
+      });
+
 
       return {
         data: {
@@ -35,14 +51,15 @@ export class AuthService {
     }
   }
 
-  async signIn(data: { email: string; password: string }) {
+  public async signIn(dto: AuthSignInDto): Promise<any> {
     try {
+      const supabase = this.supabase.getClient();
       const { data: response, error } = await supabase.auth.signInWithPassword({
-        email: data.email,
-        password: data.password,
+        email: dto.email,
+        password: dto.password,
       });
 
-      if (error) return { statusCode: error.status, message: error.message };
+      if (error) throwError({ error });
 
       return {
         data: {

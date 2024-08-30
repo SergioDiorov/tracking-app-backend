@@ -1,11 +1,13 @@
 import { Module } from '@nestjs/common';
-import { AuthController } from './auth.controller';
-import { AuthService } from './auth.service';
+
+import { AuthController } from 'src/auth/auth.controller';
+import { AuthService } from 'src/auth/auth.service';
+import { PrismaService } from 'src/prisma/prisma.service';
+import { SupabaseModule } from './supabase/supabase.module';
 
 @Module({
-  imports: [],
+  imports: [SupabaseModule],
   controllers: [AuthController],
-  providers: [AuthService],
+  providers: [AuthService, PrismaService],
 })
-// eslint-disable-next-line prettier/prettier
 export class AuthModule { }
