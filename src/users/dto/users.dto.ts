@@ -1,5 +1,6 @@
 import { IsEmail, IsNotEmpty, IsString, MinLength, MaxLength, Matches, IsOptional } from "class-validator";
-import { lettersAndSpacesRegex } from "src/auth/dto/auth.dto";
+
+import { lettersAndSpacesRegex } from "src/helpers/regex";
 
 export class ProfilePatchDataDto {
   @IsEmail({}, { message: 'Mmust be a valid email address' })

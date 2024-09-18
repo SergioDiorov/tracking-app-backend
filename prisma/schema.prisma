@@ -18,4 +18,54 @@ model Profile {
   city           String
   workPreference String
   avatar         String? 
+  organization   Organization?
+  organizationMember OrganizationMember?
+}
+
+model Organization {
+  id                    String   @id @default(uuid())
+  name                  String
+  industry              Industry
+  registrationCountry   String
+  website               String 
+  corporateEmail        String 
+  avatar                String? 
+  description           String?
+  membersIds            String[]
+  members               OrganizationMember[]   
+  owner                 Profile     @relation(fields: [ownerId], references: [userId])
+  ownerId               String      @unique
+
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+}
+
+model OrganizationMember {
+  id              String        @id @default(uuid())
+  userProfile     Profile       @relation(fields: [user], references: [userId])
+  user            String        @unique
+  joined          DateTime      @default(now())
+  role            Role
+  organization    Organization  @relation(fields: [organizationId], references: [id])
+  organizationId  String
+}
+
+// Enum for industry types
+enum Industry {
+  IT
+  Engineering
+  Entertainment
+  Management
+  Other
+}
+
+// Enum for role types in OrganizationMember
+enum Role {
+  MarketingManager
+  SalesManager    
+  ProductManager  
+  HRManager       
+  ProjectManager  
+  BusinessAnalyst 
+  ITManager       
 }
