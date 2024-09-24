@@ -11,6 +11,7 @@ datasource db {
 model Profile {
   id             String     @id @default(uuid()) 
   userId         String     @unique
+  email          String     @unique
   firstName      String
   lastName       String
   age            String
@@ -41,13 +42,20 @@ model Organization {
 }
 
 model OrganizationMember {
-  id              String        @id @default(uuid())
-  userProfile     Profile       @relation(fields: [user], references: [userId])
-  user            String        @unique
-  joined          DateTime      @default(now())
-  role            Role
-  organization    Organization  @relation(fields: [organizationId], references: [id])
-  organizationId  String
+  id                   String        @id @default(uuid())
+  userProfile          Profile       @relation(fields: [user], references: [userId])
+  user                 String        @unique
+  organization         Organization  @relation(fields: [organizationId], references: [id])
+  organizationId       String
+  joined               DateTime      @default(now())
+  email                String
+  position             Position
+  workSchedule         String
+  workHours            Int
+  salary               Int
+  type                 Type
+  workExperienceMonth  Int  
+  role                 Role
 }
 
 // Enum for industry types
@@ -59,8 +67,14 @@ enum Industry {
   Other
 }
 
-// Enum for role types in OrganizationMember
+// Enum for role in OrganizationMember
 enum Role {
+  Admin
+  Worker
+}
+
+// Enum for position in OrganizationMember
+enum Position {
   MarketingManager
   SalesManager    
   ProductManager  
@@ -69,3 +83,10 @@ enum Role {
   BusinessAnalyst 
   ITManager       
 }
+
+// Enum for type in OrganizationMember
+enum Type {
+  Contractor
+  Permanent
+}
+

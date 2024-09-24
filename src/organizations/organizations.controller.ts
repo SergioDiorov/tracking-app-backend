@@ -65,13 +65,12 @@ export class OrganizationsController {
   }
 
   // Add user to oganization
-  @Post(':organizationId/add/:userId')
+  @Post(':organizationId/add')
   addUserToOrganization(
     @Param('organizationId') organizationId: string,
-    @Param('userId') userId: string,
     @Request() req: any,
     @Body() dto: AddUserToOrganizationDto,
   ): Promise<any> {
-    return this.organizationsService.addUserToOrganization({ organizationId, userId, ownerId: req.user.sub, dto });
+    return this.organizationsService.addUserToOrganization({ organizationId, ownerId: req.user.sub, dto });
   }
 }

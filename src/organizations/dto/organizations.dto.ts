@@ -1,3 +1,4 @@
+import { Position, Role, Type } from '@prisma/client';
 import { Transform } from 'class-transformer';
 import {
   IsEmail,
@@ -50,11 +51,42 @@ export class CreateOrganizationDto {
 }
 
 export class AddUserToOrganizationDto {
+  @IsString({ message: 'Email must be a string' })
+  @IsNotEmpty({ message: 'Email is required' })
+  @IsEmail({}, { message: 'Email must be a valid email address' })
+  email: string;
+
+  @IsString({ message: 'Position must be a string' })
+  @IsNotEmpty({ message: 'Position is required' })
+  @IsIn(Object.values(Position), { message: `Position must be one of the following: ${Object.values(Position).join(', ')}` })
+  position: Position;
+
+  @IsString({ message: 'Work schedule must be a string' })
+  @IsNotEmpty({ message: 'Work schedule is required' })
+  workSchedule: string;
+
+  @IsInt({ message: 'Work hours must be an integer' })
+  @IsPositive({ message: 'Work hours must be a positive number' })
+  workHours: number;
+
+  @IsInt({ message: 'Salary must be an integer' })
+  @IsPositive({ message: 'Salary must be a positive number' })
+  salary: number;
+
+  @IsString({ message: 'Type must be a string' })
+  @IsNotEmpty({ message: 'Type is required' })
+  @IsIn(Object.values(Type), { message: `Type must be one of the following: ${Object.values(Type).join(', ')}` })
+  type: Type;
+
+
+  @IsInt({ message: 'Work experience in months must be an integer' })
+  @IsPositive({ message: 'Work experience must be a positive number' })
+  workExperienceMonth: number;
+
   @IsString({ message: 'Role must be a string' })
   @IsNotEmpty({ message: 'Role is required' })
-  @MaxLength(50, { message: 'Role is too long' })
-  @IsIn(organizationRole, { message: `Role must be one of the following: ${organizationRole.join(', ')}` })
-  role: OrganizationRoleType;
+  @IsIn(Object.values(Role), { message: `Role must be one of the following: ${Object.values(Role).join(', ')}` })
+  role: Role;
 }
 
 export class GetOrganizationMembersDto {

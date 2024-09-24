@@ -197,12 +197,10 @@ export class OrganizationsService {
 
   public async addUserToOrganization({
     organizationId,
-    userId,
     ownerId,
     dto
   }: {
     organizationId: string,
-    userId: string,
     ownerId: string,
     dto: AddUserToOrganizationDto
   }): Promise<any> {
@@ -223,12 +221,14 @@ export class OrganizationsService {
 
       // Check if profile exists with userId
       const profile = await this.prisma.profile.findUnique({
-        where: { userId: userId },
+        where: { email: dto.email },
       });
 
       if (!profile) {
-        throw new BadRequestException('Profile does not exist for this user');
+        throw new BadRequestException('Profile does not exist for this email');
       }
+
+      const userId = profile.userId;
 
       // Check if user is already a member of organization
       const existingMember = await this.prisma.organizationMember.findUnique({
@@ -243,7 +243,17 @@ export class OrganizationsService {
         data: {
           user: userId,
           organizationId: organizationId,
-          role: dto.role,
+          ...dto,
+        },
+      });
+
+      // Update organization membersIds
+      await this.prisma.organization.update({
+        where: { id: organizationId },
+        data: {
+          membersIds: {
+            push: userId,
+          },
         },
       });
 
