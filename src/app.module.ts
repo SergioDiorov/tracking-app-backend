@@ -8,9 +8,10 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import { SupabaseModule } from 'src/auth/supabase/supabase.module';
 import { AuthModule } from 'src/auth/auth.module';
 import { UsersModule } from 'src/users/users.module';
+import { OrganizationsModule } from './organizations/organizations.module';
 
 @Module({
-  imports: [ConfigModule.forRoot(), PassportModule, SupabaseModule, AuthModule, UsersModule],
+  imports: [ConfigModule.forRoot(), PassportModule, SupabaseModule, AuthModule, UsersModule, OrganizationsModule],
   providers: [
     {
       provide: APP_PIPE,

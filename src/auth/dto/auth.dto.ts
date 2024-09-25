@@ -1,6 +1,6 @@
 import { IsEmail, IsNotEmpty, IsString, MinLength, MaxLength, Matches, IsOptional } from "class-validator";
 
-export const lettersAndSpacesRegex = /^[a-zA-Z\s]+$/;
+import { lettersAndSpacesRegex } from "src/helpers/regex";
 
 export class AuthSignUpDto {
   @IsEmail({}, { message: 'Email is required and must be a valid email address' })

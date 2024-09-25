@@ -32,6 +32,7 @@ export class AuthService {
           country: dto.country,
           city: dto.city,
           workPreference: dto.workPreference,
+          email: dto.email,
         },
       });
 
