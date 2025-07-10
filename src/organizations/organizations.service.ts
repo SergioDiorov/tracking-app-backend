@@ -47,7 +47,7 @@ export class OrganizationsService {
       if (avatar) {
         // Upload the avatar
         const { data: avatarData, error: avatarError } = await supabaseClient.storage
-          .from('organizations_avatars')
+          .from('organizations-avatars')
           .upload(`organization_avatar_${Date.now()}.png`, avatar.buffer, {
             contentType: avatar.mimetype,
             upsert: false
@@ -60,7 +60,7 @@ export class OrganizationsService {
         // Get the signed URL for the new avatar
         const { data: newAvatarSignedURL, error: imageError } = await supabaseClient
           .storage
-          .from('organizations_avatars')
+          .from('organizations-avatars')
           .createSignedUrl(avatarData.path, 60 * 60 * 24 * 365 * 5)
 
         if (imageError) {
