@@ -1,8 +1,9 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 import { Supabase } from 'src/auth/supabase/supabase';
 import { throwError } from 'src/helpers/throwError';
-import { AddUserToOrganizationDto, CreateOrganizationDto } from 'src/organizations/dto/organizations.dto';
+import { AddUserToOrganizationDto, CreateOrganizationDto, CreateOrganizationTaskDto } from 'src/organizations/dto/organizations.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { Prisma } from '@prisma/client';
 
 @Injectable()
 export class OrganizationsService {
@@ -131,11 +132,13 @@ export class OrganizationsService {
   public async getOrganizationMembers({
     organizationId,
     limit = 10,
-    page = 1
+    page = 1,
+    search = '',
   }: {
     organizationId: string;
     limit: number;
     page: number;
+    search?: string;
   }): Promise<any> {
     try {
       // Search if organization exists
@@ -153,27 +156,77 @@ export class OrganizationsService {
       const skip = (page - 1) * limit;
 
       // Search organization members
-      const members = await this.prisma.organizationMember.findMany({
-        where: { organizationId: organizationId },
-        include: {
-          userProfile: {
-            select: {
-              firstName: true,
-              lastName: true,
-              age: true,
-              country: true,
-              avatar: true,
-            }
-          }
-        },
-        take: limit,
-        skip: skip,
-      });
+      // const members = await this.prisma.organizationMember.findMany({
+      //   where: { organizationId: organizationId },
+      //   include: {
+      //     userProfile: {
+      //       select: {
+      //         firstName: true,
+      //         lastName: true,
+      //         age: true,
+      //         country: true,
+      //         avatar: true,
+      //       }
+      //     }
+      //   },
+      //   take: limit,
+      //   skip: skip,
+      // });
 
       // Get total count of members for pagination info
-      const totalCount = await this.prisma.organizationMember.count({
-        where: { organizationId: organizationId },
-      });
+      // const totalCount = await this.prisma.organizationMember.count({
+      //   where: { organizationId: organizationId },
+      // });
+
+      const whereCondition = {
+        organizationId: organizationId,
+        ...(search && {
+          userProfile: {
+            is: {
+              OR: [
+                {
+                  firstName: {
+                    contains: search,
+                    mode: Prisma.QueryMode.insensitive,
+                  },
+                },
+                {
+                  lastName: {
+                    contains: search,
+                    mode: Prisma.QueryMode.insensitive,
+                  },
+                },
+              ],
+            },
+          },
+        }),
+      };
+
+      const [members, totalCount] = await this.prisma.$transaction([
+        this.prisma.organizationMember.findMany({
+          where: whereCondition,
+          include: {
+            userProfile: {
+              select: {
+                firstName: true,
+                lastName: true,
+                age: true,
+                country: true,
+                avatar: true,
+              },
+            },
+          },
+          take: limit,
+          skip: skip,
+          orderBy: {
+            joined: 'desc',
+          },
+        }),
+        this.prisma.organizationMember.count({
+          where: whereCondition,
+        }),
+      ]);
+
 
       const totalPages = Math.ceil(totalCount / limit);
 
@@ -269,4 +322,144 @@ export class OrganizationsService {
     }
   }
 
+  public async createOrganizationTask({
+    organizationId,
+    user,
+    dto,
+  }: {
+    organizationId: string;
+    user: string;
+    dto: CreateOrganizationTaskDto;
+  }): Promise<any> {
+    try {
+      const organization = await this.prisma.organization.findUnique({
+        where: { id: organizationId },
+      });
+
+      // Check if organiaztion exists
+      if (!organization) {
+        throw new NotFoundException('Organization not found');
+      }
+
+      const member = await this.prisma.organizationMember.findUnique({
+        where: { user },
+      });
+
+      // Check if user is admin or owner
+      if ((!member || member.organizationId !== organizationId || member.role !== 'Admin') && organization.ownerId !== user) {
+        throw new ForbiddenException('You have no access to create tasks in this organization');
+      }
+
+      const assignee = await this.prisma.organizationMember.findUnique({
+        where: { user: dto.assignee },
+      });
+      console.log(assignee, 'assignee');
+
+      if (!assignee || assignee.organizationId !== organizationId) {
+        throw new BadRequestException('Invalid assignee for this organization');
+      }
+
+      // create new task
+      const newTask = await this.prisma.organizationTask.create({
+        data: {
+          title: dto.title,
+          descriptopn: dto.descriptopn,
+          assignee: dto.assignee,
+          priority: dto.priority,
+          deadline: dto.deadline,
+          organizationId,
+        },
+      });
+
+      return {
+        data: { task: newTask },
+        message: 'Task created successfully',
+      };
+    } catch (error) {
+      throwError({
+        error,
+        customMessage: error.message,
+      });
+    }
+  }
+
+  public async getOrganizationTasks({
+    organizationId,
+    user,
+    limit = 10,
+    page = 1,
+  }: {
+    organizationId: string;
+    user: string;
+    limit?: number;
+    page?: number;
+  }): Promise<any> {
+    try {
+      const skip = (page - 1) * limit;
+
+      const organization = await this.prisma.organization.findUnique({
+        where: { id: organizationId },
+      });
+
+      // Check if organiaztion exists
+      if (!organization) {
+        throw new NotFoundException('Organization not found');
+      }
+
+      // Check if user if member or owner
+      if (organization.ownerId !== user) {
+        const member = await this.prisma.organizationMember.findUnique({
+          where: { user },
+        });
+
+        if (!member || member.organizationId !== organizationId) {
+          throw new ForbiddenException('You have no access to this organization tasks');
+        }
+      }
+
+      // Get organization taks
+      const [tasks, totalCount] = await this.prisma.$transaction([
+        this.prisma.organizationTask.findMany({
+          where: { organizationId },
+          include: {
+            assignedMember: {
+              select: {
+                userProfile: {
+                  select: {
+                    firstName: true,
+                    lastName: true,
+                    email: true,
+                    avatar: true,
+                  },
+                },
+              },
+            },
+          },
+          take: limit,
+          skip,
+          orderBy: { createdAt: 'desc' },
+        }),
+        this.prisma.organizationTask.count({
+          where: { organizationId },
+        }),
+      ]);
+
+      const totalPages = Math.ceil(totalCount / limit);
+
+      return {
+        data: { tasks },
+        pagination: {
+          totalItems: totalCount,
+          totalPages,
+          currentPage: page,
+          pageSize: limit,
+        },
+      };
+    } catch (error) {
+      throwError({
+        error,
+        customMessage: error.message,
+      });
+    }
+  }
 }

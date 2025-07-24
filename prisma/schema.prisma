@@ -39,6 +39,8 @@ model Organization {
 
   createdAt             DateTime @default(now())
   updatedAt             DateTime @updatedAt
+
+  OrganizationTask OrganizationTask[]
 }
 
 model OrganizationMember {
@@ -56,6 +58,8 @@ model OrganizationMember {
   type                 Type
   workExperienceMonth  Int  
   role                 Role
+
+  OrganizationTask OrganizationTask[]
 }
 
 // Enum for industry types
@@ -90,3 +94,25 @@ enum Type {
   Permanent
 }
 
+model OrganizationTask {
+  id            String       @id @default(uuid())
+  title         String
+  descriptopn   String
+  assignee      String
+  priority      Priority
+  deadline      DateTime
+  organization  Organization @relation(fields: [organizationId], references: [id])
+  organizationId String
+
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  assignedMember OrganizationMember @relation(fields: [assignee], references: [user])
+
+}
+
+enum Priority {
+  LOW
+  MEDIUM
+  HIGH
+}

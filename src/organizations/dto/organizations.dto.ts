@@ -1,4 +1,4 @@
-import { Position, Role, Type } from '@prisma/client';
+import { Position, Priority, Role, Type } from '@prisma/client';
 import { Transform } from 'class-transformer';
 import {
   IsEmail,
@@ -10,7 +10,9 @@ import {
   Matches,
   IsIn,
   IsInt,
-  IsPositive
+  IsPositive,
+  IsEnum,
+  IsDateString
 } from 'class-validator';
 
 import { lettersAndSpacesRegex } from 'src/helpers/regex';
@@ -90,6 +92,49 @@ export class AddUserToOrganizationDto {
 }
 
 export class GetOrganizationMembersDto {
+  @IsOptional()
+  @IsInt({ message: 'Limit must be an integer' })
+  @IsPositive({ message: 'Limit must be a positive number' })
+  @Transform(({ value }) => parseInt(value, 10))
+  limit?: number;
+
+  @IsOptional()
+  @IsInt({ message: 'Page must be an integer' })
+  @IsPositive({ message: 'Page must be a positive number' })
+  @Transform(({ value }) => parseInt(value, 10))
+  page?: number;
+
+  @IsOptional()
+  @IsString({ message: 'Search must be a string' })
+  @MaxLength(50, { message: 'Search must be at most 50 characters' })
+  search?: string;
+}
+
+export class CreateOrganizationTaskDto {
+  @IsString({ message: 'Title must be a string' })
+  @IsNotEmpty({ message: 'Title is required' })
+  @MaxLength(100, { message: 'Title is too long' })
+  title: string;
+
+  @IsString({ message: 'Description must be a string' })
+  @IsNotEmpty({ message: 'Description is required' })
+  @MaxLength(1000, { message: 'Description is too long' })
+  descriptopn: string;
+
+  @IsString({ message: 'Assignee ID must be a string' })
+  @IsNotEmpty({ message: 'Assignee ID is required' })
+  assignee: string;
+
+  @IsEnum(Priority, { message: `Priority must be one of the following: ${Object.values(Priority).join(', ')}` })
+  @IsNotEmpty({ message: 'Priority is required' })
+  priority: Priority;
+
+  @IsDateString({}, { message: 'Deadline must be a valid ISO date string' })
+  @IsNotEmpty({ message: 'Deadline is required' })
+  deadline: Date;
+}
+
+export class GetOrganizationTasksDto {
   @IsOptional()
   @IsInt({ message: 'Limit must be an integer' })
   @IsPositive({ message: 'Limit must be a positive number' })
