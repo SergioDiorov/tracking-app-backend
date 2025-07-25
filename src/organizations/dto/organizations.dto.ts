@@ -146,4 +146,15 @@ export class GetOrganizationTasksDto {
   @IsPositive({ message: 'Page must be a positive number' })
   @Transform(({ value }) => parseInt(value, 10))
   page?: number;
+
+  @IsOptional()
+  @IsIn(['title', 'assignee', 'priority', 'deadline', 'createdAt'], {
+    message: 'SortBy must be one of: title, assignee, priority, deadline, createdAt',
+  })
+  sortBy?: 'title' | 'assignee' | 'priority' | 'deadline' | 'createdAt';
+
+  @IsOptional()
+  @IsIn(['asc', 'desc'], { message: 'Sort order must be either "asc" or "desc"' })
+  @Transform(({ value }) => value?.toLowerCase())
+  sortOrder?: 'asc' | 'desc';
 }

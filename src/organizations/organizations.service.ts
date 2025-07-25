@@ -388,11 +388,15 @@ export class OrganizationsService {
     user,
     limit = 10,
     page = 1,
+    sortBy = 'createdAt',
+    sortOrder = 'desc',
   }: {
     organizationId: string;
     user: string;
     limit?: number;
     page?: number;
+    sortBy?: string;
+    sortOrder?: string;
   }): Promise<any> {
     try {
       const skip = (page - 1) * limit;
@@ -437,7 +441,9 @@ export class OrganizationsService {
           },
           take: limit,
           skip,
-          orderBy: { createdAt: 'desc' },
+          orderBy: {
+            [sortBy]: sortOrder,
+          },
         }),
         this.prisma.organizationTask.count({
           where: { organizationId },

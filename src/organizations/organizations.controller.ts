@@ -106,6 +106,8 @@ export class OrganizationsController {
       limit,
       page,
       user: req.user.sub,
+      sortBy: dto.sortBy || 'createdAt',
+      sortOrder: dto.sortOrder || 'desc',
     });
   }
 }
