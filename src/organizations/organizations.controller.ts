@@ -17,7 +17,9 @@ import { OrganizationsService } from 'src/organizations/organizations.service';
 import {
   AddUserToOrganizationDto,
   CreateOrganizationDto,
-  GetOrganizationMembersDto
+  CreateOrganizationTaskDto,
+  GetOrganizationMembersDto,
+  GetOrganizationTasksDto
 } from 'src/organizations/dto/organizations.dto';
 
 @Controller('organizations')
@@ -60,8 +62,9 @@ export class OrganizationsController {
   ): Promise<any> {
     const limit = dto.limit ? Number(dto.limit) : 10;
     const page = dto.page ? Number(dto.page) : 1;
+    const search = dto.search || undefined
 
-    return this.organizationsService.getOrganizationMembers({ organizationId, limit, page });
+    return this.organizationsService.getOrganizationMembers({ organizationId, limit, page, search });
   }
 
   // Add user to oganization
@@ -73,4 +76,39 @@ export class OrganizationsController {
   ): Promise<any> {
     return this.organizationsService.addUserToOrganization({ organizationId, ownerId: req.user.sub, dto });
   }
+
+  // Create organization task
+  @Post(':organizationId/tasks/create')
+  createOrganizationTask(
+    @Param('organizationId') organizationId: string,
+    @Request() req: any,
+    @Body() dto: CreateOrganizationTaskDto,
+  ): Promise<any> {
+    return this.organizationsService.createOrganizationTask({
+      organizationId,
+      user: req.user.sub,
+      dto,
+    });
+  }
+
+  // Get all tasks in organization
+  @Get(':organizationId/tasks')
+  getOrganizationTasks(
+    @Param('organizationId') organizationId: string,
+    @Request() req: any,
+    @Query() dto: GetOrganizationTasksDto,
+  ): Promise<any> {
+    const limit = dto.limit ? Number(dto.limit) : 10;
+    const page = dto.page ? Number(dto.page) : 1;
+
+    return this.organizationsService.getOrganizationTasks({
+      organizationId,
+      limit,
+      page,
+      user: req.user.sub,
+      sortBy: dto.sortBy || 'createdAt',
+      sortOrder: dto.sortOrder || 'desc',
+    });
+  }
 }
+
