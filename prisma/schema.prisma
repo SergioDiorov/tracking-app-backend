@@ -103,6 +103,10 @@ model OrganizationTask {
   deadline      DateTime
   organization  Organization @relation(fields: [organizationId], references: [id])
   organizationId String
+  startedAt     DateTime?
+  finishedAt    DateTime?
+  workStatus    WorkStatus?
+  loggedTimeSec Int?       //seconds          
 
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
@@ -111,8 +115,18 @@ model OrganizationTask {
 
 }
 
+// Task priority type
 enum Priority {
   LOW
   MEDIUM
   HIGH
+}
+
+// Task work status type
+enum WorkStatus {
+  TODO
+  BLOCKED
+  INPROGRESS
+  PUSHED
+  DONE
 }

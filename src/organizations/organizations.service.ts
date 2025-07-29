@@ -410,8 +410,12 @@ export class OrganizationsService {
         throw new NotFoundException('Organization not found');
       }
 
+      let isAdminOrOwner = false;
+
       // Check if user if member or owner
-      if (organization.ownerId !== user) {
+      if (organization.ownerId === user) {
+        isAdminOrOwner = true;
+      } else {
         const member = await this.prisma.organizationMember.findUnique({
           where: { user },
         });
@@ -419,12 +423,21 @@ export class OrganizationsService {
         if (!member || member.organizationId !== organizationId) {
           throw new ForbiddenException('You have no access to this organization tasks');
         }
-      }
+
+        if (member.role === 'Admin') {
+          isAdminOrOwner = true;
+        }
+      };
+
+      const taskWhereCondition: Prisma.OrganizationTaskWhereInput = {
+        organizationId,
+        ...(isAdminOrOwner ? {} : { assignee: user }),
+      };
 
       // Get organization taks
       const [tasks, totalCount] = await this.prisma.$transaction([
         this.prisma.organizationTask.findMany({
-          where: { organizationId },
+          where: taskWhereCondition,
           include: {
             assignedMember: {
               select: {
@@ -446,7 +459,7 @@ export class OrganizationsService {
           },
         }),
         this.prisma.organizationTask.count({
-          where: { organizationId },
+          where: taskWhereCondition,
         }),
       ]);
 
