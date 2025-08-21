@@ -134,11 +134,13 @@ export class OrganizationsService {
     limit = 10,
     page = 1,
     search = '',
+    userId = null,
   }: {
     organizationId: string;
     limit: number;
     page: number;
     search?: string;
+    userId?: string;
   }): Promise<any> {
     try {
       // Search if organization exists
@@ -180,6 +182,7 @@ export class OrganizationsService {
 
       const whereCondition = {
         organizationId: organizationId,
+        ...(userId && { user: userId }),
         ...(search && {
           userProfile: {
             is: {
@@ -240,6 +243,44 @@ export class OrganizationsService {
           currentPage: page,
           pageSize: limit,
         },
+      };
+
+    } catch (error) {
+      throwError({
+        error,
+        customMessage: error.message,
+      });
+    }
+  }
+
+  public async getOrganizationMembersById({
+    organizationId,
+    userId
+  }: {
+    organizationId: string;
+    userId: string;
+  }): Promise<any> {
+    try {
+      // Search if organization exists
+      const organization = await this.prisma.organization.findFirst({
+        where: {
+          id: organizationId,
+        }
+      });
+
+      if (!organization) {
+        throw new NotFoundException('Organization not found');
+      }
+
+
+      // Search organization member
+      const member = await this.prisma.organizationMember.findFirst({
+        where: { organizationId: organizationId, user: userId },
+      });
+      console.log(member, 'member');
+
+      return {
+        data: { member },
       };
 
     } catch (error) {

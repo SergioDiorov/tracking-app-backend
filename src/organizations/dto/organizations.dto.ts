@@ -108,6 +108,10 @@ export class GetOrganizationMembersDto {
   @IsString({ message: 'Search must be a string' })
   @MaxLength(50, { message: 'Search must be at most 50 characters' })
   search?: string;
+
+  @IsOptional()
+  @IsString({ message: 'Member ID must be a string' })
+  userId?: string;
 }
 
 export class CreateOrganizationTaskDto {
