@@ -157,4 +157,22 @@ export class GetOrganizationTasksDto {
   @IsIn(['asc', 'desc'], { message: 'Sort order must be either "asc" or "desc"' })
   @Transform(({ value }) => value?.toLowerCase())
   sortOrder?: 'asc' | 'desc';
+
+  @IsOptional()
+  @IsString({ message: 'Member ID must be a string' })
+  userId?: string;
+}
+
+export class GetOrganizationTasksProgress {
+  @IsDateString({}, { message: 'Start Date must be a valid ISO date string' })
+  @IsNotEmpty({ message: 'Start Date is required' })
+  startDate?: string;
+
+  @IsDateString({}, { message: 'End Date must be a valid ISO date string' })
+  @IsNotEmpty({ message: 'End Date is required' })
+  endDate?: string;
+
+  @IsOptional()
+  @IsString({ message: 'Member ID must be a string' })
+  userId?: string;
 }

@@ -213,6 +213,8 @@ export class OrganizationsService {
                 age: true,
                 country: true,
                 avatar: true,
+                userId: true
+
               },
             },
           },
@@ -390,6 +392,7 @@ export class OrganizationsService {
     page = 1,
     sortBy = 'createdAt',
     sortOrder = 'desc',
+    searchByUserId
   }: {
     organizationId: string;
     user: string;
@@ -397,6 +400,7 @@ export class OrganizationsService {
     page?: number;
     sortBy?: string;
     sortOrder?: string;
+    searchByUserId?: string;
   }): Promise<any> {
     try {
       const skip = (page - 1) * limit;
@@ -432,6 +436,7 @@ export class OrganizationsService {
       const taskWhereCondition: Prisma.OrganizationTaskWhereInput = {
         organizationId,
         ...(isAdminOrOwner ? {} : { assignee: user }),
+        ...(searchByUserId ? { assignee: searchByUserId } : {}),
       };
 
       // Get organization taks
@@ -473,6 +478,117 @@ export class OrganizationsService {
           currentPage: page,
           pageSize: limit,
         },
+      };
+    } catch (error) {
+      throwError({
+        error,
+        customMessage: error.message,
+      });
+    }
+  }
+
+  public async getOrganizationTasksProgress({
+    organizationId,
+    searchByUserId,
+    user,
+    startDate,
+    endDate,
+  }: {
+    organizationId: string;
+    searchByUserId: string;
+    user: string;
+    startDate: string;
+    endDate: string;
+  }): Promise<any> {
+    try {
+      const organization = await this.prisma.organization.findUnique({
+        where: { id: organizationId },
+      });
+
+      if (!organization) {
+        throw new NotFoundException('Organization not found');
+      }
+
+      // let isAdminOrOwner = false;
+
+      // if (organization.ownerId === user) {
+      //   isAdminOrOwner = true;
+      // } else {
+      //   const member = await this.prisma.organizationMember.findUnique({
+      //     where: { user },
+      //   });
+
+      //   if (!member || member.organizationId !== organizationId) {
+      //     throw new ForbiddenException('You have no access to this organization tasks');
+      //   }
+
+      //   if (member.role === 'Admin') {
+      //     isAdminOrOwner = true;
+      //   }
+      // }
+
+      const start = new Date(startDate);
+      const y = start.getUTCFullYear();
+      const m = start.getUTCMonth();
+
+      const monthStart = new Date(Date.UTC(y, m, 1, 0, 0, 0, 0));
+      const monthEnd = new Date(Date.UTC(y, m + 1, 0, 23, 59, 59, 999));
+
+      if (searchByUserId) {
+        const totalLoggedTimeSec = await this.prisma.organizationTask.aggregate({
+          _sum: { loggedTimeSec: true },
+          where: {
+            organizationId,
+            deadline: { gte: new Date(startDate), lte: new Date(endDate) },
+            assignee: searchByUserId,
+          },
+        });
+
+        const totalLoggedTimeSecMonth = await this.prisma.organizationTask.aggregate({
+          _sum: { loggedTimeSec: true },
+          where: {
+            organizationId,
+            deadline: { gte: monthStart, lte: monthEnd },
+            assignee: searchByUserId,
+          },
+        });
+
+        return {
+          totalLoggedTimeSec: totalLoggedTimeSec._sum.loggedTimeSec || 0,
+          totalLoggedTimeSecMonth: totalLoggedTimeSecMonth._sum.loggedTimeSec || 0,
+          dates: null,
+        };
+      }
+
+      const dailyStats = await this.prisma.organizationTask.groupBy({
+        by: ['deadline'],
+        _sum: { loggedTimeSec: true },
+        where: {
+          organizationId,
+          deadline: { gte: new Date(startDate), lte: new Date(endDate) },
+        },
+      });
+
+      const dates: Record<string, number> = {};
+      let totalLoggedTimeSec = 0;
+      let totalLoggedTimeSecMonth = 0;
+
+      dailyStats.forEach((item) => {
+        const dateKey = item.deadline.toISOString().split('T')[0];
+        const sec = item._sum.loggedTimeSec || 0;
+
+        dates[dateKey] = (dates[dateKey] || 0) + sec;
+        totalLoggedTimeSec += sec;
+
+        if (item.deadline >= monthStart && item.deadline <= monthEnd) {
+          totalLoggedTimeSecMonth += sec;
+        }
+      });
+
+      return {
+        totalLoggedTimeSec,
+        totalLoggedTimeSecMonth,
+        totalLoggedTimePerDates: dates,
       };
     } catch (error) {
       throwError({

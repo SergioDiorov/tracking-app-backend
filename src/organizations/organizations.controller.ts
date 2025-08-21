@@ -19,7 +19,8 @@ import {
   CreateOrganizationDto,
   CreateOrganizationTaskDto,
   GetOrganizationMembersDto,
-  GetOrganizationTasksDto
+  GetOrganizationTasksDto,
+  GetOrganizationTasksProgress
 } from 'src/organizations/dto/organizations.dto';
 
 @Controller('organizations')
@@ -105,9 +106,26 @@ export class OrganizationsController {
       organizationId,
       limit,
       page,
+      searchByUserId: dto.userId,
       user: req.user.sub,
       sortBy: dto.sortBy || 'createdAt',
       sortOrder: dto.sortOrder || 'desc',
+    });
+  }
+
+  // Get weekly tasks progress in organization
+  @Get(':organizationId/tasks/progress-weekly')
+  getOrganizationTasksProgress(
+    @Param('organizationId') organizationId: string,
+    @Request() req: any,
+    @Query() dto: GetOrganizationTasksProgress,
+  ): Promise<any> {
+    return this.organizationsService.getOrganizationTasksProgress({
+      organizationId,
+      searchByUserId: dto.userId,
+      user: req.user.sub,
+      startDate: dto.startDate,
+      endDate: dto.endDate,
     });
   }
 }
