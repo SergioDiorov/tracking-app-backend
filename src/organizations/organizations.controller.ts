@@ -19,7 +19,8 @@ import {
   CreateOrganizationDto,
   CreateOrganizationTaskDto,
   GetOrganizationMembersDto,
-  GetOrganizationTasksDto
+  GetOrganizationTasksDto,
+  GetOrganizationTasksProgress
 } from 'src/organizations/dto/organizations.dto';
 
 @Controller('organizations')
@@ -63,8 +64,18 @@ export class OrganizationsController {
     const limit = dto.limit ? Number(dto.limit) : 10;
     const page = dto.page ? Number(dto.page) : 1;
     const search = dto.search || undefined
+    const userId = dto.userId || undefined
 
-    return this.organizationsService.getOrganizationMembers({ organizationId, limit, page, search });
+    return this.organizationsService.getOrganizationMembers({ organizationId, limit, page, search, userId });
+  }
+
+  // Get member from organization
+  @Get('members/:organizationId/:userId')
+  getOrganizationMembersById(
+    @Param('organizationId') organizationId: string,
+    @Param('userId') userId: string
+  ): Promise<any> {
+    return this.organizationsService.getOrganizationMembersById({ organizationId, userId });
   }
 
   // Add user to oganization
@@ -105,9 +116,26 @@ export class OrganizationsController {
       organizationId,
       limit,
       page,
+      searchByUserId: dto.userId,
       user: req.user.sub,
       sortBy: dto.sortBy || 'createdAt',
       sortOrder: dto.sortOrder || 'desc',
+    });
+  }
+
+  // Get weekly tasks progress in organization
+  @Get(':organizationId/tasks/progress-weekly')
+  getOrganizationTasksProgress(
+    @Param('organizationId') organizationId: string,
+    @Request() req: any,
+    @Query() dto: GetOrganizationTasksProgress,
+  ): Promise<any> {
+    return this.organizationsService.getOrganizationTasksProgress({
+      organizationId,
+      searchByUserId: dto.userId,
+      user: req.user.sub,
+      startDate: dto.startDate,
+      endDate: dto.endDate,
     });
   }
 }
