@@ -1,0 +1,548 @@
+{
+	"info": {
+		"_postman_id": "3663b265-c9c9-484d-a119-69b7dae47cd3",
+		"name": "Tracking App - API",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "28250120"
+	},
+	"item": [
+		{
+			"name": "Auth",
+			"item": [
+				{
+					"name": "SignUp",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"email\": \"testPostman@gmail.com\",\r\n    \"password\": \"password\",\r\n    \"confirmPassword\": \"password\",\r\n    \"firstName\": \"Postman\",\r\n    \"lastName\": \"Test\",\r\n    \"age\": \"23\",\r\n    \"country\": \"Canada\",\r\n    \"city\": \"Ottawa\",\r\n    \"workPreference\": \"Remote\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{BaseUrl}}/signUp",
+							"host": [
+								"{{BaseUrl}}"
+							],
+							"path": [
+								"signUp"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "SignIn",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.environment.set(\"TOKEN\", pm.response.json().data.access_token);\r",
+									"pm.environment.set(\"LoggedUserId\", pm.response.json().data.user.id);\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"email\": \"sergio-test@test.com\",\r\n    \"password\": \"12341234\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{BaseUrl}}/signIn",
+							"host": [
+								"{{BaseUrl}}"
+							],
+							"path": [
+								"signIn"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Tasks",
+			"item": [
+				{
+					"name": "Get tasks from oganization",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{TOKEN}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{BaseUrl}}organizations/3c8b5cf6-c56a-40c1-8e4a-b1aff9bfbd35/tasks?limit=10&page=1&sortBy=deadline&sortOrder=asc&searchByUserId=2546f901-e11c-485f-8a8a-ed769950607a",
+							"host": [
+								"{{BaseUrl}}organizations"
+							],
+							"path": [
+								"3c8b5cf6-c56a-40c1-8e4a-b1aff9bfbd35",
+								"tasks"
+							],
+							"query": [
+								{
+									"key": "limit",
+									"value": "10"
+								},
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "sortBy",
+									"value": "deadline",
+									"description": "'title' | 'assignee' | 'priority' | 'deadline' | 'createdAt'"
+								},
+								{
+									"key": "sortOrder",
+									"value": "asc",
+									"description": "'asc' | 'desc'"
+								},
+								{
+									"key": "searchByUserId",
+									"value": "2546f901-e11c-485f-8a8a-ed769950607a"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Add task to user from oganization Copy",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{TOKEN}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"title\": \"Test task name\",\r\n  \"descriptopn\": \"Test description text for test task\",\r\n  \"assignee\": \"c320180c-6fe5-4d55-b1a6-a39aa8bb8104\",\r\n  \"priority\": \"HIGH\",\r\n  \"deadline\": \"2024-07-31T23:59:59.999Z\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{BaseUrl}}/organizations/3c8b5cf6-c56a-40c1-8e4a-b1aff9bfbd35/tasks/create",
+							"host": [
+								"{{BaseUrl}}"
+							],
+							"path": [
+								"organizations",
+								"3c8b5cf6-c56a-40c1-8e4a-b1aff9bfbd35",
+								"tasks",
+								"create"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Users",
+			"item": [
+				{
+					"name": "GetUserById",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{TOKEN}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{BaseUrl}}/users/{{LoggedUserId}}",
+							"host": [
+								"{{BaseUrl}}"
+							],
+							"path": [
+								"users",
+								"{{LoggedUserId}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "LoadUserAvatar",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{TOKEN}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "file",
+									"type": "file",
+									"src": "eNxAgZ1qA/kDz-5plF_400x400.jpg"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{BaseUrl}}/users/{{LoggedUserId}}/avatar",
+							"host": [
+								"{{BaseUrl}}"
+							],
+							"path": [
+								"users",
+								"{{LoggedUserId}}",
+								"avatar"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "UpdateUserProfile",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{TOKEN}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"age\": \"24\",\r\n    \"city\": \"Salzburg\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{BaseUrl}}/users/{{LoggedUserId}}",
+							"host": [
+								"{{BaseUrl}}"
+							],
+							"path": [
+								"users",
+								"{{LoggedUserId}}"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Organizations",
+			"item": [
+				{
+					"name": "Get analytics data",
+					"item": [
+						{
+							"name": "Get tasks organization analytics",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{TOKEN}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "formdata",
+									"formdata": []
+								},
+								"url": {
+									"raw": "{{BaseUrl}}/organizations/3c8b5cf6-c56a-40c1-8e4a-b1aff9bfbd35/analytics/tasks",
+									"host": [
+										"{{BaseUrl}}"
+									],
+									"path": [
+										"organizations",
+										"3c8b5cf6-c56a-40c1-8e4a-b1aff9bfbd35",
+										"analytics",
+										"tasks"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get employers organization analytics",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{TOKEN}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "formdata",
+									"formdata": []
+								},
+								"url": {
+									"raw": "{{BaseUrl}}/organizations/3c8b5cf6-c56a-40c1-8e4a-b1aff9bfbd35/analytics/employers",
+									"host": [
+										"{{BaseUrl}}"
+									],
+									"path": [
+										"organizations",
+										"3c8b5cf6-c56a-40c1-8e4a-b1aff9bfbd35",
+										"analytics",
+										"employers"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Create organization",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{TOKEN}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "name",
+									"value": "Postman Org",
+									"type": "text"
+								},
+								{
+									"key": "industry",
+									"value": "Entertainment",
+									"type": "text"
+								},
+								{
+									"key": "registrationCountry",
+									"value": "Canada",
+									"type": "text"
+								},
+								{
+									"key": "website",
+									"value": "https://www.postman.com",
+									"type": "text"
+								},
+								{
+									"key": "corporateEmail",
+									"value": "postmanOrg@gmail.com",
+									"type": "text"
+								},
+								{
+									"key": "description",
+									"value": "Description for organization",
+									"type": "text",
+									"disabled": true
+								},
+								{
+									"key": "file",
+									"type": "file",
+									"src": "Xo8o3DQsz/1747515.jpg",
+									"disabled": true
+								}
+							]
+						},
+						"url": {
+							"raw": "{{baseURL}}/organizations",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"organizations"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Add user to oganization",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{TOKEN}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"email\": \"testOne@gmail.com\",\r\n    \"position\": \"ITManager\",\r\n    \"workSchedule\": \"5/2\",\r\n    \"type\": \"Contractor\",\r\n    \"role\": \"Admin\",\r\n    \"workHours\": 8,\r\n    \"salary\": 1500,\r\n    \"workExperienceMonth\": 24\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseURL}}/organizations/b144e61e-2e26-4dab-aeb0-51ad342194a9/add",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"organizations",
+								"b144e61e-2e26-4dab-aeb0-51ad342194a9",
+								"add"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get user organization",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{TOKEN}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": []
+						},
+						"url": {
+							"raw": "{{baseURL}}/organizations/7739bac1-e3d9-4685-956a-cb5cf4acb5b9",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"organizations",
+								"7739bac1-e3d9-4685-956a-cb5cf4acb5b9"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get organization all members",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{TOKEN}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": []
+						},
+						"url": {
+							"raw": "{{baseURL}}/organizations/members/34ff2a72-56b7-413f-b00a-747a6304eeb5",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"organizations",
+								"members",
+								"34ff2a72-56b7-413f-b00a-747a6304eeb5"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}

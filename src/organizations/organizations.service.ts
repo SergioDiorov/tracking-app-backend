@@ -4,6 +4,7 @@ import { throwError } from 'src/helpers/throwError';
 import { AddUserToOrganizationDto, CreateOrganizationDto, CreateOrganizationTaskDto } from 'src/organizations/dto/organizations.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { Prisma } from '@prisma/client';
+import { formatOrganizationAnalytics } from 'src/helpers/formatOrganizationAnalytics';
 
 @Injectable()
 export class OrganizationsService {
@@ -637,5 +638,214 @@ export class OrganizationsService {
         customMessage: error.message,
       });
     }
+  }
+
+  public async getOrganizationEmployersAnalytics({
+    organizationId,
+    user,
+  }: {
+    organizationId: string;
+    user: string;
+  }): Promise<any> {
+    try {
+      const organization = await this.prisma.organization.findUnique({
+        where: { id: organizationId },
+      });
+
+      if (!organization) {
+        throw new NotFoundException('Organization not found');
+      }
+
+      let isAdminOrOwner = false;
+
+      if (organization.ownerId === user) {
+        isAdminOrOwner = true;
+      } else {
+        const member = await this.prisma.organizationMember.findUnique({
+          where: { user },
+        });
+
+        if (!member || member.organizationId !== organizationId) {
+          throw new ForbiddenException('You have no access to this organization tasks');
+        }
+
+        if (member.role === 'Admin') {
+          isAdminOrOwner = true;
+        }
+      }
+
+      // Get all organization members with: salary | age | workExperienceMonth
+      const members = await this.prisma.organizationMember.findMany({
+        where: { organizationId },
+        select: {
+          salary: true,
+          workExperienceMonth: true,
+          userProfile: {
+            select: { age: true }
+          }
+        }
+      });
+
+      // Define ranges for salary, age, and experience
+      const ranges = {
+        salaryRanges: [
+          { min: 0, max: 500, label: '0 - 500' },
+          { min: 500, max: 1000, label: '500 - 1000' },
+          { min: 1000, max: 1500, label: '1000 - 1500' },
+          { min: 1500, max: 2000, label: '1500 - 2000' },
+          { min: 2000, max: 3000, label: '2000 - 3000' },
+          { min: 3000, max: Infinity, label: '3000+' },
+        ],
+        ageRanges: [
+          { min: 18, max: 25, label: '18 - 25' },
+          { min: 26, max: 35, label: '26 - 35' },
+          { min: 36, max: 45, label: '36 - 45' },
+          { min: 46, max: 55, label: '46 - 55' },
+          { min: 56, max: 65, label: '56 - 65' },
+          { min: 66, max: Infinity, label: '65+' },
+        ],
+        expRanges: [
+          { min: 0, max: 12, label: '0 - 1 year' },
+          { min: 13, max: 24, label: '1 - 2 years' },
+          { min: 25, max: 60, label: '2 - 5 years' },
+          { min: 61, max: 96, label: '5 - 8 years' },
+          { min: 97, max: Infinity, label: '8+ years' },
+        ]
+      }
+
+      // Format the salary results
+      const salaryResult = formatOrganizationAnalytics(members, ranges.salaryRanges, m => m.salary ?? 0);
+
+      // Format the age results
+      const ageResult = formatOrganizationAnalytics(
+        members,
+        ranges.ageRanges,
+        m => m.userProfile?.age ? parseInt(m.userProfile.age, 10) : null
+      );
+
+      // Format the experience results
+      const expResult = formatOrganizationAnalytics(
+        members,
+        ranges.expRanges,
+        m => m.workExperienceMonth ?? 0
+      );
+
+      return {
+        data: {
+          salary: salaryResult,
+          age: ageResult,
+          experience: expResult,
+        }
+      };
+
+    } catch (error) {
+      throwError({
+        error,
+        customMessage: error.message,
+      });
+    }
+  }
+
+  public async getOrganizationTasksAnalytics({
+    organizationId,
+    user,
+  }: {
+    organizationId: string;
+    user: string;
+  }): Promise<any> {
+    try {
+      const organization = await this.prisma.organization.findUnique({
+        where: { id: organizationId },
+      });
+
+      if (!organization) {
+        throw new NotFoundException('Organization not found');
+      }
+
+      let isAdminOrOwner = false;
+
+      if (organization.ownerId === user) {
+        isAdminOrOwner = true;
+      } else {
+        const member = await this.prisma.organizationMember.findUnique({
+          where: { user },
+        });
+
+        if (!member || member.organizationId !== organizationId) {
+          throw new ForbiddenException('You have no access to this organization tasks');
+        }
+
+        if (member.role === 'Admin') {
+          isAdminOrOwner = true;
+        }
+      }
+
+      // Get all organization tasks with: loggedTimeSec | priority | workStatus
+      const allTasks = await this.prisma.organizationTask.findMany({
+        where: { organizationId },
+        select: {
+          loggedTimeSec: true,
+          finishedAt: true,
+          createdAt: true,
+          priority: true,
+          workStatus: true
+        },
+      });
+
+      // Collect logged time data
+      const monthlyData: { [key: string]: number } = {};
+      for (const task of allTasks) {
+        if (task.loggedTimeSec) {
+          const date = task.finishedAt ?? task.createdAt;
+          const monthKey = `${date.getFullYear()}-${(date.getMonth() + 1)
+            .toString()
+            .padStart(2, '0')}`;
+
+          if (!monthlyData[monthKey]) {
+            monthlyData[monthKey] = 0;
+          }
+          monthlyData[monthKey] += task.loggedTimeSec;
+        }
+      }
+
+      const loggedTime = Object.entries(monthlyData).map(([month, totalSec]) => ({
+        month,
+        hours: Math.round(totalSec / 3600),
+      }));
+
+      // Collect priority data
+      const priorityCounts: Record<string, number> = {};
+      for (const task of allTasks) {
+        const key = task.priority;
+        if (!priorityCounts[key]) {
+          priorityCounts[key] = 0;
+        }
+        priorityCounts[key] += 1;
+      }
+
+      // Collect work status data
+      const workStatusCounts: Record<string, number> = {};
+      for (const task of allTasks) {
+        const key = task.workStatus;
+        if (!workStatusCounts[key]) {
+          workStatusCounts[key] = 0;
+        }
+        workStatusCounts[key] += 1;
+      }
+
+      return {
+        data: {
+          loggedTime,
+          tasksByPriority: priorityCounts,
+          tasksByWorkStatus: workStatusCounts,
+        },
+      };
+    } catch (error) {
+      throwError({
+        error,
+        customMessage: error.message,
+      });
+    }
+
   }
 }
