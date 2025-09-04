@@ -69,6 +69,14 @@ export class OrganizationsController {
     return this.organizationsService.getOrganizationMembers({ organizationId, limit, page, search, userId });
   }
 
+  // Get all members for export
+  @Get('members/:organizationId/export')
+  getAllOrganizationMembersForExport(
+    @Param('organizationId') organizationId: string
+  ): Promise<any> {
+    return this.organizationsService.getAllOrganizationMembersForExport({ organizationId });
+  }
+
   // Get member from organization
   @Get('members/:organizationId/:userId')
   getOrganizationMembersById(

@@ -254,6 +254,69 @@ export class OrganizationsService {
     }
   }
 
+  public async getAllOrganizationMembersForExport({
+    organizationId,
+  }: {
+    organizationId: string;
+  }): Promise<any> {
+    try {
+      const organization = await this.prisma.organization.findFirst({
+        where: {
+          id: organizationId,
+        },
+      });
+
+      if (!organization) {
+        throw new NotFoundException('Organization not found');
+      }
+
+      const members = await this.prisma.organizationMember.findMany({
+        where: {
+          organizationId: organizationId,
+        },
+        include: {
+          userProfile: {
+            select: {
+              firstName: true,
+              lastName: true,
+              age: true,
+              country: true,
+              avatar: true,
+              userId: true,
+            },
+          },
+        },
+        orderBy: {
+          joined: 'desc',
+        },
+      });
+
+      const formattedMembers = members.map((member) => ({
+        firstName: member.userProfile?.firstName,
+        lastName: member.userProfile?.lastName,
+        age: member.userProfile?.age,
+        country: member.userProfile?.country,
+        joined: member.joined,
+        email: member.email,
+        position: member.position,
+        workSchedule: member.workSchedule,
+        workHours: member.workHours,
+        salary: member.salary,
+        type: member.type,
+        workExperienceMonth: member.workExperienceMonth,
+        role: member.role,
+      }));
+
+      return { data: { members: formattedMembers } };
+
+    } catch (error) {
+      throwError({
+        error,
+        customMessage: error.message,
+      });
+    }
+  }
+
   public async getOrganizationMembersById({
     organizationId,
     userId
