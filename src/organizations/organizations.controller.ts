@@ -138,5 +138,29 @@ export class OrganizationsController {
       endDate: dto.endDate,
     });
   }
+
+  // Get employers analytics in organization
+  @Get(':organizationId/analytics/employers')
+  getOrganizationEmployersAnalytics(
+    @Param('organizationId') organizationId: string,
+    @Request() req: any,
+  ): Promise<any> {
+    return this.organizationsService.getOrganizationEmployersAnalytics({
+      organizationId,
+      user: req.user.sub,
+    });
+  }
+
+  // Get tasks analytics in organization
+  @Get(':organizationId/analytics/tasks')
+  getOrganizationTasksAnalytics(
+    @Param('organizationId') organizationId: string,
+    @Request() req: any,
+  ): Promise<any> {
+    return this.organizationsService.getOrganizationTasksAnalytics({
+      organizationId,
+      user: req.user.sub,
+    });
+  }
 }
 
