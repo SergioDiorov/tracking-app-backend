@@ -422,9 +422,9 @@
 							]
 						},
 						"url": {
-							"raw": "{{baseURL}}/organizations",
+							"raw": "{{BaseUrl}}/organizations",
 							"host": [
-								"{{baseURL}}"
+								"{{BaseUrl}}"
 							],
 							"path": [
 								"organizations"
@@ -458,9 +458,9 @@
 							}
 						},
 						"url": {
-							"raw": "{{baseURL}}/organizations/b144e61e-2e26-4dab-aeb0-51ad342194a9/add",
+							"raw": "{{BaseUrl}}/organizations/b144e61e-2e26-4dab-aeb0-51ad342194a9/add",
 							"host": [
-								"{{baseURL}}"
+								"{{BaseUrl}}"
 							],
 							"path": [
 								"organizations",
@@ -494,9 +494,9 @@
 							"formdata": []
 						},
 						"url": {
-							"raw": "{{baseURL}}/organizations/7739bac1-e3d9-4685-956a-cb5cf4acb5b9",
+							"raw": "{{BaseUrl}}/organizations/7739bac1-e3d9-4685-956a-cb5cf4acb5b9",
 							"host": [
-								"{{baseURL}}"
+								"{{BaseUrl}}"
 							],
 							"path": [
 								"organizations",
@@ -529,14 +529,51 @@
 							"formdata": []
 						},
 						"url": {
-							"raw": "{{baseURL}}/organizations/members/34ff2a72-56b7-413f-b00a-747a6304eeb5",
+							"raw": "{{BaseUrl}}/organizations/members/34ff2a72-56b7-413f-b00a-747a6304eeb5",
 							"host": [
-								"{{baseURL}}"
+								"{{BaseUrl}}"
 							],
 							"path": [
 								"organizations",
 								"members",
 								"34ff2a72-56b7-413f-b00a-747a6304eeb5"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get organization all members export",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{TOKEN}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": []
+						},
+						"url": {
+							"raw": "{{BaseUrl}}/organizations/members/3c8b5cf6-c56a-40c1-8e4a-b1aff9bfbd35/export",
+							"host": [
+								"{{BaseUrl}}"
+							],
+							"path": [
+								"organizations",
+								"members",
+								"3c8b5cf6-c56a-40c1-8e4a-b1aff9bfbd35",
+								"export"
 							]
 						}
 					},
