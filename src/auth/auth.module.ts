@@ -10,4 +10,4 @@ import { SupabaseModule } from './supabase/supabase.module';
   controllers: [AuthController],
   providers: [AuthService, PrismaService],
 })
-export class AuthModule { }
+export class AuthModule {}

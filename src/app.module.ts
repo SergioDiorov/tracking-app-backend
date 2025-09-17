@@ -9,9 +9,18 @@ import { SupabaseModule } from 'src/auth/supabase/supabase.module';
 import { AuthModule } from 'src/auth/auth.module';
 import { UsersModule } from 'src/users/users.module';
 import { OrganizationsModule } from './organizations/organizations.module';
+import { TaskLogsModule } from './task-logs/task-logs.module';
 
 @Module({
-  imports: [ConfigModule.forRoot(), PassportModule, SupabaseModule, AuthModule, UsersModule, OrganizationsModule],
+  imports: [
+    ConfigModule.forRoot(),
+    PassportModule,
+    SupabaseModule,
+    AuthModule,
+    UsersModule,
+    OrganizationsModule,
+    TaskLogsModule,
+  ],
   providers: [
     {
       provide: APP_PIPE,
@@ -21,7 +30,7 @@ import { OrganizationsModule } from './organizations/organizations.module';
       provide: APP_GUARD,
       useClass: SupabaseGuard,
     },
-    PrismaService
+    PrismaService,
   ],
 })
-export class AppModule { }
+export class AppModule {}

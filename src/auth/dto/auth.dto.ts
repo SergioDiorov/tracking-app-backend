@@ -1,9 +1,20 @@
-import { IsEmail, IsNotEmpty, IsString, MinLength, MaxLength, Matches, IsOptional } from "class-validator";
+import {
+  IsEmail,
+  IsNotEmpty,
+  IsString,
+  MinLength,
+  MaxLength,
+  Matches,
+  IsOptional,
+} from 'class-validator';
 
-import { lettersAndSpacesRegex } from "src/helpers/regex";
+import { lettersAndSpacesRegex } from 'src/helpers/regex';
 
 export class AuthSignUpDto {
-  @IsEmail({}, { message: 'Email is required and must be a valid email address' })
+  @IsEmail(
+    {},
+    { message: 'Email is required and must be a valid email address' },
+  )
   @IsNotEmpty({ message: 'Email is required' })
   @MaxLength(64, { message: 'Email is too long' })
   email: string;
@@ -16,25 +27,33 @@ export class AuthSignUpDto {
 
   @IsString({ message: 'Confirm password must be a string' })
   @IsNotEmpty({ message: 'Confirm password is required' })
-  @MinLength(8, { message: 'Confirm password must be at least 8 characters long' })
+  @MinLength(8, {
+    message: 'Confirm password must be at least 8 characters long',
+  })
   @MaxLength(64, { message: 'Confirm password is too long' })
   confirmPassword: string;
 
   @IsString({ message: 'First name must be a string' })
   @IsNotEmpty({ message: 'First name is required' })
   @MaxLength(64, { message: 'First name is too long' })
-  @Matches(lettersAndSpacesRegex, { message: 'Name must be only letters and spaces' })
+  @Matches(lettersAndSpacesRegex, {
+    message: 'Name must be only letters and spaces',
+  })
   firstName: string;
 
   @IsString({ message: 'Last name must be a string' })
   @IsNotEmpty({ message: 'Last name is required' })
   @MaxLength(64, { message: 'Last name is too long' })
-  @Matches(lettersAndSpacesRegex, { message: 'Name must be only letters and spaces' })
+  @Matches(lettersAndSpacesRegex, {
+    message: 'Name must be only letters and spaces',
+  })
   lastName: string;
 
   @IsString({ message: 'Age must be a string' })
   @IsNotEmpty({ message: 'Age is required' })
-  @Matches(/^[1-9][0-9]?$/, { message: 'Age must be a number between 18 and 70' })
+  @Matches(/^[1-9][0-9]?$/, {
+    message: 'Age must be a number between 18 and 70',
+  })
   age: string;
 
   @IsString({ message: 'Country must be a string' })

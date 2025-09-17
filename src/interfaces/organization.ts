@@ -3,17 +3,23 @@ export enum IndustryEnum {
   ENGINEERING = 'Engineering',
   ENTERTAINMENT = 'Entertainment',
   MANAGEMENT = 'Management',
-  OTHER = 'Other'
+  OTHER = 'Other',
 }
 
 export type IndustryType =
-  IndustryEnum.ENGINEERING |
-  IndustryEnum.ENTERTAINMENT |
-  IndustryEnum.IT |
-  IndustryEnum.MANAGEMENT |
-  IndustryEnum.OTHER;
+  | IndustryEnum.ENGINEERING
+  | IndustryEnum.ENTERTAINMENT
+  | IndustryEnum.IT
+  | IndustryEnum.MANAGEMENT
+  | IndustryEnum.OTHER;
 
-export const industry: IndustryType[] = [IndustryEnum.ENGINEERING, IndustryEnum.ENTERTAINMENT, IndustryEnum.IT, IndustryEnum.MANAGEMENT, IndustryEnum.OTHER];
+export const industry: IndustryType[] = [
+  IndustryEnum.ENGINEERING,
+  IndustryEnum.ENTERTAINMENT,
+  IndustryEnum.IT,
+  IndustryEnum.MANAGEMENT,
+  IndustryEnum.OTHER,
+];
 
 export enum OrganizationRoleEnum {
   MARKETING_MANAGER = 'MarketingManager',
@@ -26,13 +32,13 @@ export enum OrganizationRoleEnum {
 }
 
 export type OrganizationRoleType =
-  OrganizationRoleEnum.MARKETING_MANAGER |
-  OrganizationRoleEnum.SALES_MANAGER |
-  OrganizationRoleEnum.PRODUCT_MANAGER |
-  OrganizationRoleEnum.HR_MANAGER |
-  OrganizationRoleEnum.PROJECT_MANAGER |
-  OrganizationRoleEnum.BUSINESS_ANALYST |
-  OrganizationRoleEnum.IT_MANAGER;
+  | OrganizationRoleEnum.MARKETING_MANAGER
+  | OrganizationRoleEnum.SALES_MANAGER
+  | OrganizationRoleEnum.PRODUCT_MANAGER
+  | OrganizationRoleEnum.HR_MANAGER
+  | OrganizationRoleEnum.PROJECT_MANAGER
+  | OrganizationRoleEnum.BUSINESS_ANALYST
+  | OrganizationRoleEnum.IT_MANAGER;
 
 export const organizationRole: OrganizationRoleType[] = [
   OrganizationRoleEnum.MARKETING_MANAGER,
@@ -42,4 +48,4 @@ export const organizationRole: OrganizationRoleType[] = [
   OrganizationRoleEnum.PROJECT_MANAGER,
   OrganizationRoleEnum.BUSINESS_ANALYST,
   OrganizationRoleEnum.IT_MANAGER,
-]
+];

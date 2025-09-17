@@ -12,23 +12,28 @@ import {
   IsInt,
   IsPositive,
   IsEnum,
-  IsDateString
+  IsDateString,
 } from 'class-validator';
 
 import { lettersAndSpacesRegex } from 'src/helpers/regex';
-import { industry, IndustryType, organizationRole, OrganizationRoleType } from 'src/interfaces/organization';
+import { PaginationParamsDto } from 'src/interfaces/dto';
+import { industry, IndustryType } from 'src/interfaces/organization';
 
 export class CreateOrganizationDto {
   @IsString({ message: 'Name must be a string' })
   @IsNotEmpty({ message: 'Name is required' })
   @MaxLength(100, { message: 'Name is too long' })
-  @Matches(lettersAndSpacesRegex, { message: 'Name must be only letters and spaces' })
+  @Matches(lettersAndSpacesRegex, {
+    message: 'Name must be only letters and spaces',
+  })
   name: string;
 
   @IsString({ message: 'Industry must be a string' })
   @IsNotEmpty({ message: 'Industry is required' })
   @MaxLength(50, { message: 'Industry is too long' })
-  @IsIn(industry, { message: `Industry must be one of the following: ${industry.join(', ')}` })
+  @IsIn(industry, {
+    message: `Industry must be one of the following: ${industry.join(', ')}`,
+  })
   industry: IndustryType;
 
   @IsString({ message: 'Registration country must be a string' })
@@ -60,7 +65,9 @@ export class AddUserToOrganizationDto {
 
   @IsString({ message: 'Position must be a string' })
   @IsNotEmpty({ message: 'Position is required' })
-  @IsIn(Object.values(Position), { message: `Position must be one of the following: ${Object.values(Position).join(', ')}` })
+  @IsIn(Object.values(Position), {
+    message: `Position must be one of the following: ${Object.values(Position).join(', ')}`,
+  })
   position: Position;
 
   @IsString({ message: 'Work schedule must be a string' })
@@ -77,9 +84,10 @@ export class AddUserToOrganizationDto {
 
   @IsString({ message: 'Type must be a string' })
   @IsNotEmpty({ message: 'Type is required' })
-  @IsIn(Object.values(Type), { message: `Type must be one of the following: ${Object.values(Type).join(', ')}` })
+  @IsIn(Object.values(Type), {
+    message: `Type must be one of the following: ${Object.values(Type).join(', ')}`,
+  })
   type: Type;
-
 
   @IsInt({ message: 'Work experience in months must be an integer' })
   @IsPositive({ message: 'Work experience must be a positive number' })
@@ -87,23 +95,13 @@ export class AddUserToOrganizationDto {
 
   @IsString({ message: 'Role must be a string' })
   @IsNotEmpty({ message: 'Role is required' })
-  @IsIn(Object.values(Role), { message: `Role must be one of the following: ${Object.values(Role).join(', ')}` })
+  @IsIn(Object.values(Role), {
+    message: `Role must be one of the following: ${Object.values(Role).join(', ')}`,
+  })
   role: Role;
 }
 
-export class GetOrganizationMembersDto {
-  @IsOptional()
-  @IsInt({ message: 'Limit must be an integer' })
-  @IsPositive({ message: 'Limit must be a positive number' })
-  @Transform(({ value }) => parseInt(value, 10))
-  limit?: number;
-
-  @IsOptional()
-  @IsInt({ message: 'Page must be an integer' })
-  @IsPositive({ message: 'Page must be a positive number' })
-  @Transform(({ value }) => parseInt(value, 10))
-  page?: number;
-
+export class GetOrganizationMembersDto extends PaginationParamsDto {
   @IsOptional()
   @IsString({ message: 'Search must be a string' })
   @MaxLength(50, { message: 'Search must be at most 50 characters' })
@@ -129,7 +127,9 @@ export class CreateOrganizationTaskDto {
   @IsNotEmpty({ message: 'Assignee ID is required' })
   assignee: string;
 
-  @IsEnum(Priority, { message: `Priority must be one of the following: ${Object.values(Priority).join(', ')}` })
+  @IsEnum(Priority, {
+    message: `Priority must be one of the following: ${Object.values(Priority).join(', ')}`,
+  })
   @IsNotEmpty({ message: 'Priority is required' })
   priority: Priority;
 
@@ -138,27 +138,18 @@ export class CreateOrganizationTaskDto {
   deadline: Date;
 }
 
-export class GetOrganizationTasksDto {
-  @IsOptional()
-  @IsInt({ message: 'Limit must be an integer' })
-  @IsPositive({ message: 'Limit must be a positive number' })
-  @Transform(({ value }) => parseInt(value, 10))
-  limit?: number;
-
-  @IsOptional()
-  @IsInt({ message: 'Page must be an integer' })
-  @IsPositive({ message: 'Page must be a positive number' })
-  @Transform(({ value }) => parseInt(value, 10))
-  page?: number;
-
+export class GetOrganizationTasksDto extends PaginationParamsDto {
   @IsOptional()
   @IsIn(['title', 'assignee', 'priority', 'deadline', 'createdAt'], {
-    message: 'SortBy must be one of: title, assignee, priority, deadline, createdAt',
+    message:
+      'SortBy must be one of: title, assignee, priority, deadline, createdAt',
   })
   sortBy?: 'title' | 'assignee' | 'priority' | 'deadline' | 'createdAt';
 
   @IsOptional()
-  @IsIn(['asc', 'desc'], { message: 'Sort order must be either "asc" or "desc"' })
+  @IsIn(['asc', 'desc'], {
+    message: 'Sort order must be either "asc" or "desc"',
+  })
   @Transform(({ value }) => value?.toLowerCase())
   sortOrder?: 'asc' | 'desc';
 
