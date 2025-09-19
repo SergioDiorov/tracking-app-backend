@@ -56,7 +56,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"email\": \"sergio-test@test.com\",\r\n    \"password\": \"12341234\"\r\n}",
+							"raw": "{\r\n    \"email\": \"sergio-test@test.com\", // sergio-test@test.com - owner | testHannah86@gmail.com - worker\r\n    \"password\": \"12341234\"          \r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -96,12 +96,13 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{BaseUrl}}organizations/3c8b5cf6-c56a-40c1-8e4a-b1aff9bfbd35/tasks?limit=10&page=1&sortBy=deadline&sortOrder=asc&searchByUserId=2546f901-e11c-485f-8a8a-ed769950607a",
+							"raw": "{{BaseUrl}}/organizations/{{LoggedOrganizationForUser}}/tasks?limit=10&page=1&sortBy=deadline&sortOrder=asc&userId={{LoggedUserId}}",
 							"host": [
-								"{{BaseUrl}}organizations"
+								"{{BaseUrl}}"
 							],
 							"path": [
-								"3c8b5cf6-c56a-40c1-8e4a-b1aff9bfbd35",
+								"organizations",
+								"{{LoggedOrganizationForUser}}",
 								"tasks"
 							],
 							"query": [
@@ -124,8 +125,9 @@
 									"description": "'asc' | 'desc'"
 								},
 								{
-									"key": "searchByUserId",
-									"value": "2546f901-e11c-485f-8a8a-ed769950607a"
+									"key": "userId",
+									"value": "{{LoggedUserId}}",
+									"description": "98f9e127-0e41-455e-8c26-299d32e4c146"
 								}
 							]
 						}
@@ -311,13 +313,13 @@
 									"formdata": []
 								},
 								"url": {
-									"raw": "{{BaseUrl}}/organizations/3c8b5cf6-c56a-40c1-8e4a-b1aff9bfbd35/analytics/tasks",
+									"raw": "{{BaseUrl}}/organizations/{{LoggedOrganizationForUser}}/analytics/tasks",
 									"host": [
 										"{{BaseUrl}}"
 									],
 									"path": [
 										"organizations",
-										"3c8b5cf6-c56a-40c1-8e4a-b1aff9bfbd35",
+										"{{LoggedOrganizationForUser}}",
 										"analytics",
 										"tasks"
 									]
@@ -348,13 +350,13 @@
 									"formdata": []
 								},
 								"url": {
-									"raw": "{{BaseUrl}}/organizations/3c8b5cf6-c56a-40c1-8e4a-b1aff9bfbd35/analytics/employers",
+									"raw": "{{BaseUrl}}/organizations/{{LoggedOrganizationForUser}}/analytics/employers",
 									"host": [
 										"{{BaseUrl}}"
 									],
 									"path": [
 										"organizations",
-										"3c8b5cf6-c56a-40c1-8e4a-b1aff9bfbd35",
+										"{{LoggedOrganizationForUser}}",
 										"analytics",
 										"employers"
 									]
@@ -458,13 +460,13 @@
 							}
 						},
 						"url": {
-							"raw": "{{BaseUrl}}/organizations/b144e61e-2e26-4dab-aeb0-51ad342194a9/add",
+							"raw": "{{BaseUrl}}/organizations/{{LoggedOrganizationForUser}}/add",
 							"host": [
 								"{{BaseUrl}}"
 							],
 							"path": [
 								"organizations",
-								"b144e61e-2e26-4dab-aeb0-51ad342194a9",
+								"{{LoggedOrganizationForUser}}",
 								"add"
 							]
 						}
@@ -473,6 +475,19 @@
 				},
 				{
 					"name": "Get user organization",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.environment.set(\"LoggedOrganizationForUser\", pm.response.json().data.organization.id);\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
 					"protocolProfileBehavior": {
 						"disableBodyPruning": true
 					},
@@ -494,13 +509,13 @@
 							"formdata": []
 						},
 						"url": {
-							"raw": "{{BaseUrl}}/organizations/7739bac1-e3d9-4685-956a-cb5cf4acb5b9",
+							"raw": "{{BaseUrl}}/organizations/{{LoggedUserId}}",
 							"host": [
 								"{{BaseUrl}}"
 							],
 							"path": [
 								"organizations",
-								"7739bac1-e3d9-4685-956a-cb5cf4acb5b9"
+								"{{LoggedUserId}}"
 							]
 						}
 					},
@@ -529,14 +544,14 @@
 							"formdata": []
 						},
 						"url": {
-							"raw": "{{BaseUrl}}/organizations/members/34ff2a72-56b7-413f-b00a-747a6304eeb5",
+							"raw": "{{BaseUrl}}/organizations/members/{{LoggedOrganizationForUser}}",
 							"host": [
 								"{{BaseUrl}}"
 							],
 							"path": [
 								"organizations",
 								"members",
-								"34ff2a72-56b7-413f-b00a-747a6304eeb5"
+								"{{LoggedOrganizationForUser}}"
 							]
 						}
 					},
@@ -565,15 +580,260 @@
 							"formdata": []
 						},
 						"url": {
-							"raw": "{{BaseUrl}}/organizations/members/3c8b5cf6-c56a-40c1-8e4a-b1aff9bfbd35/export",
+							"raw": "{{BaseUrl}}/organizations/members/{{LoggedOrganizationForUser}}/export",
 							"host": [
 								"{{BaseUrl}}"
 							],
 							"path": [
 								"organizations",
 								"members",
-								"3c8b5cf6-c56a-40c1-8e4a-b1aff9bfbd35",
+								"{{LoggedOrganizationForUser}}",
 								"export"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "TaskLogs",
+			"item": [
+				{
+					"name": "Get user task log",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{TOKEN}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{BaseUrl}}/task-logs/{{LoggedUserId}}/?page=1&limit=10",
+							"host": [
+								"{{BaseUrl}}"
+							],
+							"path": [
+								"task-logs",
+								"{{LoggedUserId}}",
+								""
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "limit",
+									"value": "10"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create task log",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{TOKEN}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"organizationId\": \"{{LoggedOrganizationForUser}}\",\r\n    \"task\": \"76ff8fc4-74d2-4eae-a6b5-c805859a1f0b\",\r\n    \"date\": \"2025-09-08T01:00:00.000Z\",\r\n    \"type\": \"REMOTE\", // OFFICE | REMOTE\r\n    \"start\": \"2025-09-09T09:30:00.000Z\",\r\n    \"end\": \"2025-09-09T12:42:00.000Z\",\r\n    \"breakSec\": 3600,\r\n    \"note\": \"Log notes\",\r\n    \"mood\": \"SMILE\" // ANGRY | FROWN | MEH | SMILE | LAUGH\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{BaseUrl}}/task-logs",
+							"host": [
+								"{{BaseUrl}}"
+							],
+							"path": [
+								"task-logs"
+							],
+							"query": [
+								{
+									"key": "organizationId",
+									"value": "{{LoggedOrganizationForUser}}",
+									"disabled": true
+								},
+								{
+									"key": "task",
+									"value": "19f2a2b1-c4d8-4c41-9062-0a4969998d5f",
+									"disabled": true
+								},
+								{
+									"key": "date",
+									"value": "2025-09-09T01:00:00.000Z",
+									"disabled": true
+								},
+								{
+									"key": "type",
+									"value": "REMOTE",
+									"description": "REMOTE | OFFICE",
+									"disabled": true
+								},
+								{
+									"key": "start",
+									"value": "2025-09-09T09:30:00.000Z",
+									"disabled": true
+								},
+								{
+									"key": "end",
+									"value": "2025-09-09T12:42:00.000Z",
+									"disabled": true
+								},
+								{
+									"key": "break",
+									"value": "3600",
+									"description": "seconds",
+									"disabled": true
+								},
+								{
+									"key": "note",
+									"value": "Log notes",
+									"disabled": true
+								},
+								{
+									"key": "mood",
+									"value": "SMILE",
+									"description": "ANGRY | FROWN | MEH | SMILE | LAUGH",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update task log",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{TOKEN}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"date\": \"2025-09-08T01:00:00.000Z\",\r\n    \"type\": \"OFFICE\", // OFFICE | REMOTE\r\n    \"start\": \"2025-09-09T09:30:00.000Z\",\r\n    \"end\": \"2025-09-09T12:42:00.000Z\",\r\n    \"breakSec\": 36,\r\n    \"note\": \"Cganged log notes 2\",\r\n    \"mood\": \"SMILE\" // ANGRY | FROWN | MEH | SMILE | LAUGH\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{BaseUrl}}/task-logs/96fe5a92-a3a7-4e49-8348-05464797c153",
+							"host": [
+								"{{BaseUrl}}"
+							],
+							"path": [
+								"task-logs",
+								"96fe5a92-a3a7-4e49-8348-05464797c153"
+							],
+							"query": [
+								{
+									"key": "organizationId",
+									"value": "{{LoggedOrganizationForUser}}",
+									"disabled": true
+								},
+								{
+									"key": "task",
+									"value": "19f2a2b1-c4d8-4c41-9062-0a4969998d5f",
+									"disabled": true
+								},
+								{
+									"key": "date",
+									"value": "2025-09-09T01:00:00.000Z",
+									"disabled": true
+								},
+								{
+									"key": "type",
+									"value": "REMOTE",
+									"description": "REMOTE | OFFICE",
+									"disabled": true
+								},
+								{
+									"key": "start",
+									"value": "2025-09-09T09:30:00.000Z",
+									"disabled": true
+								},
+								{
+									"key": "end",
+									"value": "2025-09-09T12:42:00.000Z",
+									"disabled": true
+								},
+								{
+									"key": "break",
+									"value": "3600",
+									"description": "seconds",
+									"disabled": true
+								},
+								{
+									"key": "note",
+									"value": "Log notes",
+									"disabled": true
+								},
+								{
+									"key": "mood",
+									"value": "SMILE",
+									"description": "ANGRY | FROWN | MEH | SMILE | LAUGH",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete task log",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{TOKEN}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{BaseUrl}}/task-logs/96fe5a92-a3a7-4e49-8348-05464797c153",
+							"host": [
+								"{{BaseUrl}}"
+							],
+							"path": [
+								"task-logs",
+								"96fe5a92-a3a7-4e49-8348-05464797c153"
 							]
 						}
 					},

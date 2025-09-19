@@ -10,7 +10,7 @@ import {
   Query,
   Request,
   UploadedFile,
-  UseInterceptors
+  UseInterceptors,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { OrganizationsService } from 'src/organizations/organizations.service';
@@ -20,12 +20,12 @@ import {
   CreateOrganizationTaskDto,
   GetOrganizationMembersDto,
   GetOrganizationTasksDto,
-  GetOrganizationTasksProgress
+  GetOrganizationTasksProgress,
 } from 'src/organizations/dto/organizations.dto';
 
 @Controller('organizations')
 export class OrganizationsController {
-  constructor(private readonly organizationsService: OrganizationsService) { }
+  constructor(private readonly organizationsService: OrganizationsService) {}
 
   // Get user organization
   @Get(':userId')
@@ -52,38 +52,53 @@ export class OrganizationsController {
       await pipe.transform(file);
     }
 
-    return this.organizationsService.createOrganization({ dto, userId: req.user.sub, avatar: file });
+    return this.organizationsService.createOrganization({
+      dto,
+      userId: req.user.sub,
+      avatar: file,
+    });
   }
 
   // Get organization all members
   @Get('members/:organizationId')
   getOrganizationMembers(
     @Param('organizationId') organizationId: string,
-    @Query() dto: GetOrganizationMembersDto
+    @Query() dto: GetOrganizationMembersDto,
   ): Promise<any> {
     const limit = dto.limit ? Number(dto.limit) : 10;
     const page = dto.page ? Number(dto.page) : 1;
-    const search = dto.search || undefined
-    const userId = dto.userId || undefined
+    const search = dto.search || undefined;
+    const userId = dto.userId || undefined;
 
-    return this.organizationsService.getOrganizationMembers({ organizationId, limit, page, search, userId });
+    return this.organizationsService.getOrganizationMembers({
+      organizationId,
+      limit,
+      page,
+      search,
+      userId,
+    });
   }
 
   // Get all members for export
   @Get('members/:organizationId/export')
   getAllOrganizationMembersForExport(
-    @Param('organizationId') organizationId: string
+    @Param('organizationId') organizationId: string,
   ): Promise<any> {
-    return this.organizationsService.getAllOrganizationMembersForExport({ organizationId });
+    return this.organizationsService.getAllOrganizationMembersForExport({
+      organizationId,
+    });
   }
 
   // Get member from organization
   @Get('members/:organizationId/:userId')
   getOrganizationMembersById(
     @Param('organizationId') organizationId: string,
-    @Param('userId') userId: string
+    @Param('userId') userId: string,
   ): Promise<any> {
-    return this.organizationsService.getOrganizationMembersById({ organizationId, userId });
+    return this.organizationsService.getOrganizationMembersById({
+      organizationId,
+      userId,
+    });
   }
 
   // Add user to oganization
@@ -93,7 +108,11 @@ export class OrganizationsController {
     @Request() req: any,
     @Body() dto: AddUserToOrganizationDto,
   ): Promise<any> {
-    return this.organizationsService.addUserToOrganization({ organizationId, ownerId: req.user.sub, dto });
+    return this.organizationsService.addUserToOrganization({
+      organizationId,
+      ownerId: req.user.sub,
+      dto,
+    });
   }
 
   // Create organization task
@@ -171,4 +190,3 @@ export class OrganizationsController {
     });
   }
 }
-

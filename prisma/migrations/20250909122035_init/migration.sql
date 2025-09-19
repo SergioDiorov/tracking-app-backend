@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE "TaskLog" ALTER COLUMN "mood" DROP NOT NULL;

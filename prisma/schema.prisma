@@ -41,6 +41,8 @@ model Organization {
   updatedAt             DateTime @updatedAt
 
   OrganizationTask OrganizationTask[]
+
+  TaskLog TaskLog[]
 }
 
 model OrganizationMember {
@@ -60,6 +62,8 @@ model OrganizationMember {
   role                 Role
 
   OrganizationTask OrganizationTask[]
+
+  TaskLog TaskLog[]
 }
 
 // Enum for industry types
@@ -113,6 +117,8 @@ model OrganizationTask {
 
   assignedMember OrganizationMember @relation(fields: [assignee], references: [user])
 
+
+  TaskLog TaskLog[]
 }
 
 // Task priority type
@@ -129,4 +135,38 @@ enum WorkStatus {
   INPROGRESS
   PUSHED
   DONE
+}
+
+model TaskLog {
+  id              String       @id @default(uuid())
+  organization    Organization @relation(fields: [organizationId], references: [id])
+  organizationId  String
+  task            OrganizationTask @relation(fields: [taskId], references: [id])
+  taskId          String            
+  date            DateTime
+  type            LogWorkPreference
+  start           DateTime
+  end             DateTime
+  breakSec        Int?       //seconds
+  note            String?
+  mood            LogMood?
+  assignee        OrganizationMember @relation(fields: [assigneeId], references: [user])
+  assigneeId      String
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+// Log work preference
+enum LogWorkPreference {
+  REMOTE 
+  OFFICE
+}
+
+// Log mood
+enum LogMood {
+  ANGRY
+  FROWN
+  MEH
+  SMILE
+  LAUGH
 }

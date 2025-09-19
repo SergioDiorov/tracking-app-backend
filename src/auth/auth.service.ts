@@ -8,7 +8,10 @@ import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()
 export class AuthService {
-  constructor(private readonly prisma: PrismaService, private readonly supabase: Supabase,) { }
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly supabase: Supabase,
+  ) {}
 
   public async signUp(dto: AuthSignUpDto): Promise<any> {
     try {
@@ -35,7 +38,6 @@ export class AuthService {
           email: dto.email,
         },
       });
-
 
       return {
         data: {

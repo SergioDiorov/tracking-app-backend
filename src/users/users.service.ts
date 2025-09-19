@@ -6,7 +6,10 @@ import { ProfilePatchDataDto } from 'src/users/dto/users.dto';
 
 @Injectable()
 export class UsersService {
-  constructor(private readonly prisma: PrismaService, private readonly supabase: Supabase,) { }
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly supabase: Supabase,
+  ) {}
 
   public async getUserProfile(userId: string): Promise<any> {
     try {
@@ -24,7 +27,13 @@ export class UsersService {
     }
   }
 
-  public async updateProfile({ userId, updateProfileDto }: { userId: string, updateProfileDto: ProfilePatchDataDto }): Promise<any> {
+  public async updateProfile({
+    userId,
+    updateProfileDto,
+  }: {
+    userId: string;
+    updateProfileDto: ProfilePatchDataDto;
+  }): Promise<any> {
     try {
       // Find existing profile
       const profile = await this.prisma.profile.findUnique({
@@ -49,7 +58,13 @@ export class UsersService {
     }
   }
 
-  public async uploadFile({ file, userId }: { file: Express.Multer.File, userId: string }): Promise<any> {
+  public async uploadFile({
+    file,
+    userId,
+  }: {
+    file: Express.Multer.File;
+    userId: string;
+  }): Promise<any> {
     try {
       const supabaseClient = this.supabase.getClient();
 
@@ -62,8 +77,7 @@ export class UsersService {
         const regex = /avatars\/([^/?]+)/;
         const match = profile.avatar.match(regex);
 
-        const { error: deleteError } = await supabaseClient
-          .storage
+        const { error: deleteError } = await supabaseClient.storage
           .from('avatars')
           .remove([match[1]]);
 
@@ -77,7 +91,7 @@ export class UsersService {
         .from('avatars')
         .upload(`avatar_${Date.now()}.png`, file.buffer, {
           contentType: file.mimetype,
-          upsert: false
+          upsert: false,
         });
 
       if (error) {
@@ -85,10 +99,10 @@ export class UsersService {
       }
 
       // Get the signed URL for the new avatar
-      const { data: urlAvatarData, error: imageError } = await supabaseClient
-        .storage
-        .from('avatars')
-        .createSignedUrl(data.path, 60 * 60 * 24 * 365 * 5)
+      const { data: urlAvatarData, error: imageError } =
+        await supabaseClient.storage
+          .from('avatars')
+          .createSignedUrl(data.path, 60 * 60 * 24 * 365 * 5);
 
       if (imageError) {
         throw new Error(imageError.message);
@@ -127,10 +141,7 @@ export class UsersService {
           data: { avatar: null },
         });
 
-        await supabaseClient
-          .storage
-          .from('avatars')
-          .remove([match[1]])
+        await supabaseClient.storage.from('avatars').remove([match[1]]);
       }
 
       return {

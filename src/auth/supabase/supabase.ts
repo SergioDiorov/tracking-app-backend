@@ -15,7 +15,7 @@ export class Supabase {
   constructor(
     @Inject(REQUEST) private readonly request: Request,
     private readonly configService: ConfigService,
-  ) { }
+  ) {}
 
   getClient() {
     this.logger.log('getting supabase client...');

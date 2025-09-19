@@ -1,7 +1,16 @@
-import { BadRequestException, ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { Supabase } from 'src/auth/supabase/supabase';
 import { throwError } from 'src/helpers/throwError';
-import { AddUserToOrganizationDto, CreateOrganizationDto, CreateOrganizationTaskDto } from 'src/organizations/dto/organizations.dto';
+import {
+  AddUserToOrganizationDto,
+  CreateOrganizationDto,
+  CreateOrganizationTaskDto,
+} from 'src/organizations/dto/organizations.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { Prisma } from '@prisma/client';
 import { formatOrganizationAnalytics } from 'src/helpers/formatOrganizationAnalytics';
@@ -11,9 +20,17 @@ export class OrganizationsService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly supabase: Supabase,
-  ) { }
+  ) {}
 
-  public async createOrganization({ dto, userId, avatar }: { dto: CreateOrganizationDto, userId: string, avatar?: Express.Multer.File }): Promise<any> {
+  public async createOrganization({
+    dto,
+    userId,
+    avatar,
+  }: {
+    dto: CreateOrganizationDto;
+    userId: string;
+    avatar?: Express.Multer.File;
+  }): Promise<any> {
     try {
       const supabaseClient = this.supabase.getClient();
 
@@ -41,29 +58,32 @@ export class OrganizationsService {
       });
 
       if (existingMember) {
-        throw new BadRequestException('User is already a member of organization');
+        throw new BadRequestException(
+          'User is already a member of organization',
+        );
       }
 
       let urlAvatarData = null;
 
       if (avatar) {
         // Upload the avatar
-        const { data: avatarData, error: avatarError } = await supabaseClient.storage
-          .from('organizations-avatars')
-          .upload(`organization_avatar_${Date.now()}.png`, avatar.buffer, {
-            contentType: avatar.mimetype,
-            upsert: false
-          });
+        const { data: avatarData, error: avatarError } =
+          await supabaseClient.storage
+            .from('organizations-avatars')
+            .upload(`organization_avatar_${Date.now()}.png`, avatar.buffer, {
+              contentType: avatar.mimetype,
+              upsert: false,
+            });
 
         if (avatarError) {
           throw new Error(avatarError.message);
         }
 
         // Get the signed URL for the new avatar
-        const { data: newAvatarSignedURL, error: imageError } = await supabaseClient
-          .storage
-          .from('organizations-avatars')
-          .createSignedUrl(avatarData.path, 60 * 60 * 24 * 365 * 5)
+        const { data: newAvatarSignedURL, error: imageError } =
+          await supabaseClient.storage
+            .from('organizations-avatars')
+            .createSignedUrl(avatarData.path, 60 * 60 * 24 * 365 * 5);
 
         if (imageError) {
           throw new Error(imageError.message);
@@ -97,7 +117,7 @@ export class OrganizationsService {
       const ownerOrganization = await this.prisma.organization.findFirst({
         where: {
           ownerId: userId,
-        }
+        },
       });
 
       if (ownerOrganization) {
@@ -112,15 +132,14 @@ export class OrganizationsService {
       if (member) {
         const organization = await this.prisma.organization.findFirst({
           where: {
-            id: member.organizationId
-          }
+            id: member.organizationId,
+          },
         });
 
         return { data: { organization } };
       }
 
       throw new NotFoundException('Organization not found');
-
     } catch (error) {
       throwError({
         error,
@@ -128,7 +147,6 @@ export class OrganizationsService {
       });
     }
   }
-
 
   public async getOrganizationMembers({
     organizationId,
@@ -148,7 +166,7 @@ export class OrganizationsService {
       const organization = await this.prisma.organization.findFirst({
         where: {
           id: organizationId,
-        }
+        },
       });
 
       if (!organization) {
@@ -217,8 +235,7 @@ export class OrganizationsService {
                 age: true,
                 country: true,
                 avatar: true,
-                userId: true
-
+                userId: true,
               },
             },
           },
@@ -233,7 +250,6 @@ export class OrganizationsService {
         }),
       ]);
 
-
       const totalPages = Math.ceil(totalCount / limit);
 
       return {
@@ -245,7 +261,6 @@ export class OrganizationsService {
           pageSize: limit,
         },
       };
-
     } catch (error) {
       throwError({
         error,
@@ -308,7 +323,6 @@ export class OrganizationsService {
       }));
 
       return { data: { members: formattedMembers } };
-
     } catch (error) {
       throwError({
         error,
@@ -319,7 +333,7 @@ export class OrganizationsService {
 
   public async getOrganizationMembersById({
     organizationId,
-    userId
+    userId,
   }: {
     organizationId: string;
     userId: string;
@@ -329,13 +343,12 @@ export class OrganizationsService {
       const organization = await this.prisma.organization.findFirst({
         where: {
           id: organizationId,
-        }
+        },
       });
 
       if (!organization) {
         throw new NotFoundException('Organization not found');
       }
-
 
       // Search organization member
       const member = await this.prisma.organizationMember.findFirst({
@@ -346,7 +359,6 @@ export class OrganizationsService {
       return {
         data: { member },
       };
-
     } catch (error) {
       throwError({
         error,
@@ -358,11 +370,11 @@ export class OrganizationsService {
   public async addUserToOrganization({
     organizationId,
     ownerId,
-    dto
+    dto,
   }: {
-    organizationId: string,
-    ownerId: string,
-    dto: AddUserToOrganizationDto
+    organizationId: string;
+    ownerId: string;
+    dto: AddUserToOrganizationDto;
   }): Promise<any> {
     try {
       // Check if organization exists with organizationId
@@ -396,7 +408,9 @@ export class OrganizationsService {
       });
 
       if (existingMember) {
-        throw new BadRequestException('User is already a member of organization');
+        throw new BadRequestException(
+          'User is already a member of organization',
+        );
       }
 
       const member = await this.prisma.organizationMember.create({
@@ -453,8 +467,15 @@ export class OrganizationsService {
       });
 
       // Check if user is admin or owner
-      if ((!member || member.organizationId !== organizationId || member.role !== 'Admin') && organization.ownerId !== user) {
-        throw new ForbiddenException('You have no access to create tasks in this organization');
+      if (
+        (!member ||
+          member.organizationId !== organizationId ||
+          member.role !== 'Admin') &&
+        organization.ownerId !== user
+      ) {
+        throw new ForbiddenException(
+          'You have no access to create tasks in this organization',
+        );
       }
 
       const assignee = await this.prisma.organizationMember.findUnique({
@@ -497,7 +518,7 @@ export class OrganizationsService {
     page = 1,
     sortBy = 'createdAt',
     sortOrder = 'desc',
-    searchByUserId
+    searchByUserId,
   }: {
     organizationId: string;
     user: string;
@@ -530,13 +551,15 @@ export class OrganizationsService {
         });
 
         if (!member || member.organizationId !== organizationId) {
-          throw new ForbiddenException('You have no access to this organization tasks');
+          throw new ForbiddenException(
+            'You have no access to this organization tasks',
+          );
         }
 
         if (member.role === 'Admin') {
           isAdminOrOwner = true;
         }
-      };
+      }
 
       const taskWhereCondition: Prisma.OrganizationTaskWhereInput = {
         organizationId,
@@ -595,7 +618,7 @@ export class OrganizationsService {
   public async getOrganizationTasksProgress({
     organizationId,
     searchByUserId,
-    user,
+    // user,
     startDate,
     endDate,
   }: {
@@ -640,27 +663,31 @@ export class OrganizationsService {
       const monthEnd = new Date(Date.UTC(y, m + 1, 0, 23, 59, 59, 999));
 
       if (searchByUserId) {
-        const totalLoggedTimeSec = await this.prisma.organizationTask.aggregate({
-          _sum: { loggedTimeSec: true },
-          where: {
-            organizationId,
-            deadline: { gte: new Date(startDate), lte: new Date(endDate) },
-            assignee: searchByUserId,
+        const totalLoggedTimeSec = await this.prisma.organizationTask.aggregate(
+          {
+            _sum: { loggedTimeSec: true },
+            where: {
+              organizationId,
+              deadline: { gte: new Date(startDate), lte: new Date(endDate) },
+              assignee: searchByUserId,
+            },
           },
-        });
+        );
 
-        const totalLoggedTimeSecMonth = await this.prisma.organizationTask.aggregate({
-          _sum: { loggedTimeSec: true },
-          where: {
-            organizationId,
-            deadline: { gte: monthStart, lte: monthEnd },
-            assignee: searchByUserId,
-          },
-        });
+        const totalLoggedTimeSecMonth =
+          await this.prisma.organizationTask.aggregate({
+            _sum: { loggedTimeSec: true },
+            where: {
+              organizationId,
+              deadline: { gte: monthStart, lte: monthEnd },
+              assignee: searchByUserId,
+            },
+          });
 
         return {
           totalLoggedTimeSec: totalLoggedTimeSec._sum.loggedTimeSec || 0,
-          totalLoggedTimeSecMonth: totalLoggedTimeSecMonth._sum.loggedTimeSec || 0,
+          totalLoggedTimeSecMonth:
+            totalLoggedTimeSecMonth._sum.loggedTimeSec || 0,
           dates: null,
         };
       }
@@ -729,7 +756,9 @@ export class OrganizationsService {
         });
 
         if (!member || member.organizationId !== organizationId) {
-          throw new ForbiddenException('You have no access to this organization tasks');
+          throw new ForbiddenException(
+            'You have no access to this organization tasks',
+          );
         }
 
         if (member.role === 'Admin') {
@@ -744,9 +773,9 @@ export class OrganizationsService {
           salary: true,
           workExperienceMonth: true,
           userProfile: {
-            select: { age: true }
-          }
-        }
+            select: { age: true },
+          },
+        },
       });
 
       // Define ranges for salary, age, and experience
@@ -773,24 +802,28 @@ export class OrganizationsService {
           { min: 25, max: 60, label: '2 - 5 years' },
           { min: 61, max: 96, label: '5 - 8 years' },
           { min: 97, max: Infinity, label: '8+ years' },
-        ]
-      }
+        ],
+      };
 
       // Format the salary results
-      const salaryResult = formatOrganizationAnalytics(members, ranges.salaryRanges, m => m.salary ?? 0);
+      const salaryResult = formatOrganizationAnalytics(
+        members,
+        ranges.salaryRanges,
+        (m) => m.salary ?? 0,
+      );
 
       // Format the age results
       const ageResult = formatOrganizationAnalytics(
         members,
         ranges.ageRanges,
-        m => m.userProfile?.age ? parseInt(m.userProfile.age, 10) : null
+        (m) => (m.userProfile?.age ? parseInt(m.userProfile.age, 10) : null),
       );
 
       // Format the experience results
       const expResult = formatOrganizationAnalytics(
         members,
         ranges.expRanges,
-        m => m.workExperienceMonth ?? 0
+        (m) => m.workExperienceMonth ?? 0,
       );
 
       return {
@@ -798,9 +831,8 @@ export class OrganizationsService {
           salary: salaryResult,
           age: ageResult,
           experience: expResult,
-        }
+        },
       };
-
     } catch (error) {
       throwError({
         error,
@@ -835,7 +867,9 @@ export class OrganizationsService {
         });
 
         if (!member || member.organizationId !== organizationId) {
-          throw new ForbiddenException('You have no access to this organization tasks');
+          throw new ForbiddenException(
+            'You have no access to this organization tasks',
+          );
         }
 
         if (member.role === 'Admin') {
@@ -851,7 +885,7 @@ export class OrganizationsService {
           finishedAt: true,
           createdAt: true,
           priority: true,
-          workStatus: true
+          workStatus: true,
         },
       });
 
@@ -871,10 +905,12 @@ export class OrganizationsService {
         }
       }
 
-      const loggedTime = Object.entries(monthlyData).map(([month, totalSec]) => ({
-        month,
-        hours: Math.round(totalSec / 3600),
-      }));
+      const loggedTime = Object.entries(monthlyData).map(
+        ([month, totalSec]) => ({
+          month,
+          hours: Math.round(totalSec / 3600),
+        }),
+      );
 
       // Collect priority data
       const priorityCounts: Record<string, number> = {};
@@ -909,6 +945,5 @@ export class OrganizationsService {
         customMessage: error.message,
       });
     }
-
   }
 }
