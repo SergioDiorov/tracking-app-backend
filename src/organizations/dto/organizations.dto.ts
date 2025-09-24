@@ -1,4 +1,4 @@
-import { Position, Priority, Role, Type } from '@prisma/client';
+import { Position, Priority, Role, Type, WorkStatus } from '@prisma/client';
 import { Transform } from 'class-transformer';
 import {
   IsEmail,
@@ -156,6 +156,13 @@ export class GetOrganizationTasksDto extends PaginationParamsDto {
   @IsOptional()
   @IsString({ message: 'Member ID must be a string' })
   userId?: string;
+
+
+  @IsOptional()
+  @IsEnum(WorkStatus, {
+    message: `Work status must be one of the following: ${Object.values(WorkStatus).join(', ')}`,
+  })
+  filterByWorkStatus?: WorkStatus;
 }
 
 export class GetOrganizationTasksProgress {
