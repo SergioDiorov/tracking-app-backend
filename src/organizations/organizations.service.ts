@@ -12,7 +12,7 @@ import {
   CreateOrganizationTaskDto,
 } from 'src/organizations/dto/organizations.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { Prisma } from '@prisma/client';
+import { Prisma, WorkStatus } from '@prisma/client';
 import { formatOrganizationAnalytics } from 'src/helpers/formatOrganizationAnalytics';
 
 @Injectable()
@@ -20,7 +20,7 @@ export class OrganizationsService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly supabase: Supabase,
-  ) {}
+  ) { }
 
   public async createOrganization({
     dto,
@@ -519,6 +519,7 @@ export class OrganizationsService {
     sortBy = 'createdAt',
     sortOrder = 'desc',
     searchByUserId,
+    filterByWorkStatus,
   }: {
     organizationId: string;
     user: string;
@@ -527,6 +528,7 @@ export class OrganizationsService {
     sortBy?: string;
     sortOrder?: string;
     searchByUserId?: string;
+    filterByWorkStatus?: WorkStatus;
   }): Promise<any> {
     try {
       const skip = (page - 1) * limit;
@@ -565,6 +567,7 @@ export class OrganizationsService {
         organizationId,
         ...(isAdminOrOwner ? {} : { assignee: user }),
         ...(searchByUserId ? { assignee: searchByUserId } : {}),
+        ...(filterByWorkStatus ? { workStatus: filterByWorkStatus } : {}),
       };
 
       // Get organization taks

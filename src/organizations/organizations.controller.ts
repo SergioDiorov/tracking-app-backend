@@ -25,7 +25,7 @@ import {
 
 @Controller('organizations')
 export class OrganizationsController {
-  constructor(private readonly organizationsService: OrganizationsService) {}
+  constructor(private readonly organizationsService: OrganizationsService) { }
 
   // Get user organization
   @Get(':userId')
@@ -147,6 +147,7 @@ export class OrganizationsController {
       user: req.user.sub,
       sortBy: dto.sortBy || 'createdAt',
       sortOrder: dto.sortOrder || 'desc',
+      filterByWorkStatus: dto?.filterByWorkStatus,
     });
   }
 
