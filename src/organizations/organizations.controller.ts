@@ -76,6 +76,8 @@ export class OrganizationsController {
       page,
       search,
       userId,
+      sortBy: dto.sortBy || 'joined',
+      sortOrder: dto.sortOrder || 'desc',
     });
   }
 

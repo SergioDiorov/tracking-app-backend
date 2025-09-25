@@ -154,12 +154,16 @@ export class OrganizationsService {
     page = 1,
     search = '',
     userId = null,
+    sortBy = 'joined',
+    sortOrder = 'desc',
   }: {
     organizationId: string;
     limit: number;
     page: number;
     search?: string;
     userId?: string;
+    sortBy?: string;
+    sortOrder?: string;
   }): Promise<any> {
     try {
       // Search if organization exists
@@ -224,6 +228,14 @@ export class OrganizationsService {
         }),
       };
 
+      const profileSortFields = ['firstName', 'age', 'country'];
+
+      const orderBy = profileSortFields.includes(sortBy) ? {
+        userProfile: {
+          [sortBy]: sortOrder,
+        },
+      } : { [sortBy]: sortOrder, }
+
       const [members, totalCount] = await this.prisma.$transaction([
         this.prisma.organizationMember.findMany({
           where: whereCondition,
@@ -241,9 +253,7 @@ export class OrganizationsService {
           },
           take: limit,
           skip: skip,
-          orderBy: {
-            joined: 'desc',
-          },
+          orderBy,
         }),
         this.prisma.organizationMember.count({
           where: whereCondition,

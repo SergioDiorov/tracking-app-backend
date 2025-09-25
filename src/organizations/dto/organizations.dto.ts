@@ -110,6 +110,32 @@ export class GetOrganizationMembersDto extends PaginationParamsDto {
   @IsOptional()
   @IsString({ message: 'Member ID must be a string' })
   userId?: string;
+
+  @IsOptional()
+  @IsIn([
+    'joined',
+    'position',
+    'workHours',
+    'salary',
+    'type',
+    'workExperienceMonth',
+    'role',
+    'firstName',
+    'age',
+    'country',
+    'workSchedule',
+  ], {
+    message:
+      'SortBy must be one of: title, assignee, priority, deadline, createdAt',
+  })
+  sortBy?: 'joined' | 'position' | 'workHours' | 'salary' | 'type' | 'workExperienceMonth' | 'role' | 'firstName' | 'age' | 'country' | 'workSchedule';
+
+  @IsOptional()
+  @IsIn(['asc', 'desc'], {
+    message: 'Sort order must be either "asc" or "desc"',
+  })
+  @Transform(({ value }) => value?.toLowerCase())
+  sortOrder?: 'asc' | 'desc';
 }
 
 export class CreateOrganizationTaskDto {
