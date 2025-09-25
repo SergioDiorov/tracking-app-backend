@@ -128,6 +128,12 @@
 									"key": "userId",
 									"value": "{{LoggedUserId}}",
 									"description": "98f9e127-0e41-455e-8c26-299d32e4c146"
+								},
+								{
+									"key": "filterByWorkStatus",
+									"value": "TODO",
+									"description": "TODO | BLOCKED | INPROGRESS | PUSHED | DONE",
+									"disabled": true
 								}
 							]
 						}
@@ -544,7 +550,7 @@
 							"formdata": []
 						},
 						"url": {
-							"raw": "{{BaseUrl}}/organizations/members/{{LoggedOrganizationForUser}}",
+							"raw": "{{BaseUrl}}/organizations/members/{{LoggedOrganizationForUser}}?page=1&limit=10&search=test&sortBy=joined&sortOrder=desc",
 							"host": [
 								"{{BaseUrl}}"
 							],
@@ -552,6 +558,39 @@
 								"organizations",
 								"members",
 								"{{LoggedOrganizationForUser}}"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "1",
+									"description": "Response page"
+								},
+								{
+									"key": "limit",
+									"value": "10",
+									"description": "Response items size"
+								},
+								{
+									"key": "search",
+									"value": "test",
+									"description": "Search member by name"
+								},
+								{
+									"key": "userId",
+									"value": "{{LoggedUserId}}",
+									"description": "Search member by userId",
+									"disabled": true
+								},
+								{
+									"key": "sortBy",
+									"value": "joined",
+									"description": "'joined' | 'position' | 'workHours' | 'salary' | 'type' | 'workExperienceMonth' | 'role' | 'firstName' | 'age' | 'country'"
+								},
+								{
+									"key": "sortOrder",
+									"value": "desc",
+									"description": "'asc' | 'desc'"
+								}
 							]
 						}
 					},
