@@ -141,7 +141,7 @@
 					"response": []
 				},
 				{
-					"name": "Add task to user from oganization Copy",
+					"name": "Add task",
 					"request": {
 						"auth": {
 							"type": "bearer",
@@ -174,6 +174,76 @@
 								"3c8b5cf6-c56a-40c1-8e4a-b1aff9bfbd35",
 								"tasks",
 								"create"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update task",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{TOKEN}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"title\": \"1A Test task name 3 edit\",\r\n  \"descriptopn\": \"Test description text for test task\",\r\n  \"assignee\": \"044c719c-2dae-4ab3-82bb-0d067911529b\",\r\n  \"priority\": \"LOW\",\r\n  \"deadline\": \"2024-10-22T00:00:00.000Z\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{BaseUrl}}/organizations/{{LoggedOrganizationForUser}}/tasks/update/0c8de6a2-d55b-45ca-8af0-bd597b15d36e",
+							"host": [
+								"{{BaseUrl}}"
+							],
+							"path": [
+								"organizations",
+								"{{LoggedOrganizationForUser}}",
+								"tasks",
+								"update",
+								"0c8de6a2-d55b-45ca-8af0-bd597b15d36e"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete task",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{TOKEN}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{BaseUrl}}/organizations/{{LoggedOrganizationForUser}}/tasks/a8450722-b084-4e3d-8b7a-bf6aa5ca3855",
+							"host": [
+								"{{BaseUrl}}"
+							],
+							"path": [
+								"organizations",
+								"{{LoggedOrganizationForUser}}",
+								"tasks",
+								"a8450722-b084-4e3d-8b7a-bf6aa5ca3855"
 							]
 						}
 					},

@@ -1,3 +1,4 @@
+import { Optional } from '@nestjs/common';
 import { Position, Priority, Role, Type, WorkStatus } from '@prisma/client';
 import { Transform } from 'class-transformer';
 import {
@@ -162,6 +163,32 @@ export class CreateOrganizationTaskDto {
   @IsDateString({}, { message: 'Deadline must be a valid ISO date string' })
   @IsNotEmpty({ message: 'Deadline is required' })
   deadline: Date;
+}
+
+export class UpdateOrganizationTaskDto {
+  @IsString({ message: 'Title must be a string' })
+  @MaxLength(100, { message: 'Title is too long' })
+  @Optional()
+  title?: string;
+
+  @Optional()
+  @IsString({ message: 'Description must be a string' })
+  @MaxLength(1000, { message: 'Description is too long' })
+  descriptopn?: string;
+
+  @Optional()
+  @IsString({ message: 'Assignee ID must be a string' })
+  assignee?: string;
+
+  @Optional()
+  @IsEnum(Priority, {
+    message: `Priority must be one of the following: ${Object.values(Priority).join(', ')}`,
+  })
+  priority?: Priority;
+
+  @Optional()
+  @IsDateString({}, { message: 'Deadline must be a valid ISO date string' })
+  deadline?: Date;
 }
 
 export class GetOrganizationTasksDto extends PaginationParamsDto {

@@ -141,8 +141,8 @@ model TaskLog {
   id              String       @id @default(uuid())
   organization    Organization @relation(fields: [organizationId], references: [id])
   organizationId  String
-  task            OrganizationTask @relation(fields: [taskId], references: [id])
-  taskId          String            
+  task            OrganizationTask? @relation(fields: [taskId], references: [id], onDelete: SetNull)
+  taskId          String?            
   date            DateTime
   type            LogWorkPreference
   start           DateTime

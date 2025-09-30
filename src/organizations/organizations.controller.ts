@@ -1,11 +1,13 @@
 import {
   Body,
   Controller,
+  Delete,
   FileTypeValidator,
   Get,
   MaxFileSizeValidator,
   Param,
   ParseFilePipe,
+  Patch,
   Post,
   Query,
   Request,
@@ -21,6 +23,7 @@ import {
   GetOrganizationMembersDto,
   GetOrganizationTasksDto,
   GetOrganizationTasksProgress,
+  UpdateOrganizationTaskDto,
 } from 'src/organizations/dto/organizations.dto';
 
 @Controller('organizations')
@@ -130,6 +133,37 @@ export class OrganizationsController {
       dto,
     });
   }
+
+  // Update organization task
+  @Patch(':organizationId/tasks/update/:taskId')
+  async updateTaskLog(
+    @Param('organizationId') organizationId: string,
+    @Param('taskId') taskId: string,
+    @Request() req: any,
+    @Body() dto: Partial<UpdateOrganizationTaskDto>,
+  ): Promise<any> {
+    return this.organizationsService.updateOrganizationTask({
+      organizationId,
+      taskId,
+      user: req.user.sub,
+      dto,
+    });
+  }
+
+  // Delete organization task
+  @Delete(':organizationId/tasks/:taskId')
+  async deleteOrganizationTask(
+    @Param('organizationId') organizationId: string,
+    @Param('taskId') taskId: string,
+    @Request() req: any,
+  ): Promise<any> {
+    return this.organizationsService.deleteOrganizationTask({
+      organizationId,
+      taskId,
+      user: req.user.sub,
+    });
+  }
+
 
   // Get all tasks in organization
   @Get(':organizationId/tasks')
