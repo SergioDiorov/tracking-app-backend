@@ -102,6 +102,53 @@ export class AddUserToOrganizationDto {
   role: Role;
 }
 
+export class UpdateUserFromOrganizationDto {
+  @Optional()
+  @IsString({ message: 'Email must be a string' })
+  @IsEmail({}, { message: 'Email must be a valid email address' })
+  email?: string;
+
+  @Optional()
+  @IsString({ message: 'Position must be a string' })
+  @IsIn(Object.values(Position), {
+    message: `Position must be one of the following: ${Object.values(Position).join(', ')}`,
+  })
+  position?: Position;
+
+  @Optional()
+  @IsString({ message: 'Work schedule must be a string' })
+  workSchedule?: string;
+
+  @Optional()
+  @IsInt({ message: 'Work hours must be an integer' })
+  @IsPositive({ message: 'Work hours must be a positive number' })
+  workHours?: number;
+
+  @Optional()
+  @IsInt({ message: 'Salary must be an integer' })
+  @IsPositive({ message: 'Salary must be a positive number' })
+  salary?: number;
+
+  @Optional()
+  @IsString({ message: 'Type must be a string' })
+  @IsIn(Object.values(Type), {
+    message: `Type must be one of the following: ${Object.values(Type).join(', ')}`,
+  })
+  type?: Type;
+
+  @Optional()
+  @IsInt({ message: 'Work experience in months must be an integer' })
+  @IsPositive({ message: 'Work experience must be a positive number' })
+  workExperienceMonth?: number;
+
+  @Optional()
+  @IsString({ message: 'Role must be a string' })
+  @IsIn(Object.values(Role), {
+    message: `Role must be one of the following: ${Object.values(Role).join(', ')}`,
+  })
+  role?: Role;
+}
+
 export class GetOrganizationMembersDto extends PaginationParamsDto {
   @IsOptional()
   @IsString({ message: 'Search must be a string' })

@@ -11,6 +11,7 @@ import {
   CreateOrganizationDto,
   CreateOrganizationTaskDto,
   UpdateOrganizationTaskDto,
+  UpdateUserFromOrganizationDto,
 } from 'src/organizations/dto/organizations.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { Prisma, WorkStatus } from '@prisma/client';
@@ -447,6 +448,143 @@ export class OrganizationsService {
       return {
         data: { member },
         message: 'User added to organization successfully',
+      };
+    } catch (error) {
+      throwError({
+        error,
+        customMessage: error.message,
+      });
+    }
+  }
+
+  public async updateUserFromOrganization({
+    organizationId,
+    user,
+    userToUpdate,
+    dto,
+  }: {
+    organizationId: string;
+    user: string;
+    userToUpdate: string;
+    dto: UpdateUserFromOrganizationDto;
+  }): Promise<any> {
+    try {
+      // Check if organization exists with organizationId
+      const organization = await this.prisma.organization.findUnique({
+        where: { id: organizationId },
+      });
+
+      // Check if organiaztion exists
+      if (!organization) {
+        throw new NotFoundException('Organization not found');
+      }
+
+      const member = await this.prisma.organizationMember.findUnique({
+        where: { user },
+      });
+
+      // Check if user is admin or owner
+      if (
+        (!member ||
+          member.organizationId !== organizationId ||
+          member.role !== 'Admin') &&
+        organization.ownerId !== user
+      ) {
+        throw new ForbiddenException(
+          'You have no access to update member in this organization',
+        );
+      }
+
+      // Check if user is a member of organization
+      const existingMember = await this.prisma.organizationMember.findUnique({
+        where: { user: userToUpdate },
+      });
+
+      if (!existingMember) {
+        throw new BadRequestException(
+          'User is not a member of organization',
+        );
+      }
+
+      const updatedUser = await this.prisma.organizationMember.update({
+        where: { user: userToUpdate },
+        data: dto,
+      });
+
+      return {
+        data: { updatedUser },
+        message: 'User in organization updated successfully',
+      };
+    } catch (error) {
+      throwError({
+        error,
+        customMessage: error.message,
+      });
+    }
+  }
+
+  public async deleteUserFromOrganization({
+    organizationId,
+    user,
+    userToDelete,
+  }: {
+    organizationId: string;
+    user: string;
+    userToDelete: string;
+  }): Promise<any> {
+    try {
+      // Check if organization exists with organizationId
+      const organization = await this.prisma.organization.findUnique({
+        where: { id: organizationId },
+      });
+
+      // Check if organiaztion exists
+      if (!organization) {
+        throw new NotFoundException('Organization not found');
+      }
+
+      const member = await this.prisma.organizationMember.findUnique({
+        where: { user },
+      });
+
+      // Check if user is admin or owner
+      if (
+        (!member ||
+          member.organizationId !== organizationId ||
+          member.role !== 'Admin') &&
+        organization.ownerId !== user
+      ) {
+        throw new ForbiddenException(
+          'You have no access to delete member from this organization',
+        );
+      }
+
+      // Check if user is a member of organization
+      const existingMember = await this.prisma.organizationMember.findUnique({
+        where: { user: userToDelete },
+      });
+
+      if (!existingMember) {
+        throw new BadRequestException(
+          'User is not a member of this organization',
+        );
+      }
+
+      await this.prisma.organizationMember.delete({
+        where: { user: userToDelete },
+      });
+
+      await this.prisma.organization.update({
+        where: { id: organizationId },
+        data: {
+          membersIds: {
+            set: organization.membersIds.filter((id) => id !== userToDelete),
+          },
+        },
+      });
+
+      return {
+        message: 'User successfully deleted from organization',
       };
     } catch (error) {
       throwError({

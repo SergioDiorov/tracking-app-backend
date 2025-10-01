@@ -24,6 +24,7 @@ import {
   GetOrganizationTasksDto,
   GetOrganizationTasksProgress,
   UpdateOrganizationTaskDto,
+  UpdateUserFromOrganizationDto,
 } from 'src/organizations/dto/organizations.dto';
 
 @Controller('organizations')
@@ -117,6 +118,36 @@ export class OrganizationsController {
       organizationId,
       ownerId: req.user.sub,
       dto,
+    });
+  }
+
+  // Update user from oganization
+  @Patch(':organizationId/member/:userId')
+  updateUserFromOrganization(
+    @Param('organizationId') organizationId: string,
+    @Param('userId') userId: string,
+    @Request() req: any,
+    @Body() dto: Partial<UpdateUserFromOrganizationDto>,
+  ): Promise<any> {
+    return this.organizationsService.updateUserFromOrganization({
+      organizationId,
+      user: req.user.sub,
+      userToUpdate: userId,
+      dto,
+    });
+  }
+
+  // Delete user from oganization
+  @Delete(':organizationId/member/:userId')
+  deleteUserFromOrganization(
+    @Param('organizationId') organizationId: string,
+    @Param('userId') userId: string,
+    @Request() req: any,
+  ): Promise<any> {
+    return this.organizationsService.deleteUserFromOrganization({
+      organizationId,
+      user: req.user.sub,
+      userToDelete: userId,
     });
   }
 
