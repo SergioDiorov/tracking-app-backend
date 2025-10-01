@@ -443,6 +443,88 @@
 					]
 				},
 				{
+					"name": "Member",
+					"item": [
+						{
+							"name": "Add user to oganization",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{TOKEN}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"email\": \"testOne@gmail.com\",\r\n    \"position\": \"ITManager\",\r\n    \"workSchedule\": \"5/2\",\r\n    \"type\": \"Contractor\",\r\n    \"role\": \"Admin\",\r\n    \"workHours\": 8,\r\n    \"salary\": 1500,\r\n    \"workExperienceMonth\": 24\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{BaseUrl}}/organizations/{{LoggedOrganizationForUser}}/add",
+									"host": [
+										"{{BaseUrl}}"
+									],
+									"path": [
+										"organizations",
+										"{{LoggedOrganizationForUser}}",
+										"add"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Update user from oganization",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{TOKEN}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "PATCH",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    // \"position\": \"SalesManager\"\r\n    // \"workSchedule\": \"8/2\"\r\n    // \"type\": \"Contractor\"\r\n    // \"role\": \"Admin\"\r\n    // \"workHours\": 40\r\n    // \"salary\": 3200\r\n    // \"workExperienceMonth\": 36\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{BaseUrl}}/organizations/{{LoggedOrganizationForUser}}/member/98f9e127-0e41-455e-8c26-299d32e4c146",
+									"host": [
+										"{{BaseUrl}}"
+									],
+									"path": [
+										"organizations",
+										"{{LoggedOrganizationForUser}}",
+										"member",
+										"98f9e127-0e41-455e-8c26-299d32e4c146"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
 					"name": "Create organization",
 					"request": {
 						"auth": {
@@ -506,44 +588,6 @@
 							],
 							"path": [
 								"organizations"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Add user to oganization",
-					"request": {
-						"auth": {
-							"type": "bearer",
-							"bearer": [
-								{
-									"key": "token",
-									"value": "{{TOKEN}}",
-									"type": "string"
-								}
-							]
-						},
-						"method": "POST",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "{\r\n    \"email\": \"testOne@gmail.com\",\r\n    \"position\": \"ITManager\",\r\n    \"workSchedule\": \"5/2\",\r\n    \"type\": \"Contractor\",\r\n    \"role\": \"Admin\",\r\n    \"workHours\": 8,\r\n    \"salary\": 1500,\r\n    \"workExperienceMonth\": 24\r\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "{{BaseUrl}}/organizations/{{LoggedOrganizationForUser}}/add",
-							"host": [
-								"{{BaseUrl}}"
-							],
-							"path": [
-								"organizations",
-								"{{LoggedOrganizationForUser}}",
-								"add"
 							]
 						}
 					},
