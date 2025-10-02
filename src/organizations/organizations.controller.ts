@@ -21,6 +21,7 @@ import {
   CreateOrganizationDto,
   CreateOrganizationTaskDto,
   GetOrganizationMembersDto,
+  GetOrganizationTasksAnalytics,
   GetOrganizationTasksDto,
   GetOrganizationTasksProgress,
   UpdateOrganizationTaskDto,
@@ -251,10 +252,12 @@ export class OrganizationsController {
   getOrganizationTasksAnalytics(
     @Param('organizationId') organizationId: string,
     @Request() req: any,
+    @Query() dto: GetOrganizationTasksAnalytics,
   ): Promise<any> {
     return this.organizationsService.getOrganizationTasksAnalytics({
       organizationId,
       user: req.user.sub,
+      userToSearch: dto?.userToSearch || undefined
     });
   }
 }

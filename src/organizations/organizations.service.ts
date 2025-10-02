@@ -1132,9 +1132,11 @@ export class OrganizationsService {
   public async getOrganizationTasksAnalytics({
     organizationId,
     user,
+    userToSearch
   }: {
     organizationId: string;
     user: string;
+    userToSearch?: string;
   }): Promise<any> {
     try {
       const organization = await this.prisma.organization.findUnique({
@@ -1167,7 +1169,10 @@ export class OrganizationsService {
 
       // Get all organization tasks with: loggedTimeSec | priority | workStatus
       const allTasks = await this.prisma.organizationTask.findMany({
-        where: { organizationId },
+        where: {
+          organizationId,
+          ...(userToSearch !== undefined && { assignee: userToSearch }),
+        },
         select: {
           loggedTimeSec: true,
           finishedAt: true,

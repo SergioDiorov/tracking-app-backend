@@ -278,3 +278,9 @@ export class GetOrganizationTasksProgress {
   @IsString({ message: 'Member ID must be a string' })
   userId?: string;
 }
+
+export class GetOrganizationTasksAnalytics {
+  @IsOptional()
+  @IsString({ message: 'Member ID must be a string' })
+  userToSearch?: string;
+}
