@@ -3,7 +3,7 @@ import { Supabase } from 'src/auth/supabase/supabase';
 import { BadRequest } from 'http-errors';
 
 import { throwError } from 'src/helpers/throwError';
-import { AuthSignInDto, AuthSignUpDto } from 'src/auth/dto/auth.dto';
+import { AuthResetPasswordDto, AuthSignInDto, AuthSignUpDto } from 'src/auth/dto/auth.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()
@@ -11,7 +11,7 @@ export class AuthService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly supabase: Supabase,
-  ) {}
+  ) { }
 
   public async signUp(dto: AuthSignUpDto): Promise<any> {
     try {
@@ -76,6 +76,37 @@ export class AuthService {
       };
     } catch (e) {
       throw e;
+    }
+  }
+
+  public async resetPassword({ dto: { oldPassword, newPassword }, email }: { dto: AuthResetPasswordDto; email: string }): Promise<any> {
+    try {
+      const supabase = this.supabase.getClient();
+
+      if (newPassword === oldPassword) {
+        throw new BadRequest(`Old password should not match new password`);
+      }
+
+      const { error: signInError } = await supabase.auth.signInWithPassword({
+        email: email,
+        password: oldPassword,
+      });
+
+      if (signInError) {
+        throw new BadRequest(signInError.message);
+      }
+
+      const { error: updateError } = await supabase.auth.updateUser({
+        password: newPassword,
+      })
+
+      if (updateError) {
+        throw new BadRequest(updateError.message);
+      }
+
+      return { message: 'Password updated successfully' };
+    } catch (e) {
+      throw new BadRequest(e.message);
     }
   }
 }

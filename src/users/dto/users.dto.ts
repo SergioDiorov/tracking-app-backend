@@ -16,22 +16,6 @@ export class ProfilePatchDataDto {
   @IsOptional()
   email?: string;
 
-  @IsString({ message: 'Password must be a string' })
-  @IsNotEmpty({ message: 'Password is required' })
-  @MinLength(8, { message: 'Password must be at least 8 characters long' })
-  @MaxLength(64, { message: 'Password is too long' })
-  @IsOptional()
-  oldPassword?: string;
-
-  @IsString({ message: 'Confirm password must be a string' })
-  @IsNotEmpty({ message: 'Confirm password is required' })
-  @MinLength(8, {
-    message: 'Confirm password must be at least 8 characters long',
-  })
-  @MaxLength(64, { message: 'Confirm password is too long' })
-  @IsOptional()
-  newPassword?: string;
-
   @IsString({ message: 'First name must be a string' })
   @IsNotEmpty({ message: 'First name is required' })
   @MaxLength(64, { message: 'First name is too long' })
