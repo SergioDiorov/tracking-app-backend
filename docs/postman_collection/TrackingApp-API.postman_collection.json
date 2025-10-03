@@ -74,6 +74,42 @@
 						}
 					},
 					"response": []
+				},
+				{
+					"name": "Reset password",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{TOKEN}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"oldPassword\": \"old-password\",\r\n    \"newPassword\": \"new-password\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{BaseUrl}}/reset-password",
+							"host": [
+								"{{BaseUrl}}"
+							],
+							"path": [
+								"reset-password"
+							]
+						}
+					},
+					"response": []
 				}
 			]
 		},
@@ -196,7 +232,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n  \"title\": \"1A Test task name 3 edit\",\r\n  \"descriptopn\": \"Test description text for test task\",\r\n  \"assignee\": \"044c719c-2dae-4ab3-82bb-0d067911529b\",\r\n  \"priority\": \"LOW\",\r\n  \"deadline\": \"2024-10-22T00:00:00.000Z\"\r\n}",
+							"raw": "{\r\n  \"title\": \"1A Test task name 3 edit 1234\",\r\n  \"workStatus\": \"TODO\",\r\n  \"descriptopn\": \"Test description text for test task\",\r\n  \"assignee\": \"044c719c-2dae-4ab3-82bb-0d067911529b\",\r\n  \"priority\": \"LOW\",\r\n  \"deadline\": \"2024-10-22T00:00:00.000Z\"\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -389,7 +425,7 @@
 									"formdata": []
 								},
 								"url": {
-									"raw": "{{BaseUrl}}/organizations/{{LoggedOrganizationForUser}}/analytics/tasks",
+									"raw": "{{BaseUrl}}/organizations/{{LoggedOrganizationForUser}}/analytics/tasks?userToSearch={{LoggedUserId}}",
 									"host": [
 										"{{BaseUrl}}"
 									],
@@ -398,6 +434,12 @@
 										"{{LoggedOrganizationForUser}}",
 										"analytics",
 										"tasks"
+									],
+									"query": [
+										{
+											"key": "userToSearch",
+											"value": "{{LoggedUserId}}"
+										}
 									]
 								}
 							},
@@ -500,7 +542,7 @@
 								"header": [],
 								"body": {
 									"mode": "raw",
-									"raw": "{\r\n    // \"position\": \"SalesManager\"\r\n    // \"workSchedule\": \"8/2\"\r\n    // \"type\": \"Contractor\"\r\n    // \"role\": \"Admin\"\r\n    // \"workHours\": 40\r\n    // \"salary\": 3200\r\n    // \"workExperienceMonth\": 36\r\n}",
+									"raw": "{\r\n    \"position\": \"SalesManager\"\r\n    // \"workSchedule\": \"8/2\"\r\n    // \"type\": \"Contractor\"\r\n    // \"role\": \"Admin\"\r\n    // \"workHours\": 40\r\n    // \"salary\": 3200\r\n    // \"workExperienceMonth\": 36\r\n}",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -517,6 +559,36 @@
 										"{{LoggedOrganizationForUser}}",
 										"member",
 										"98f9e127-0e41-455e-8c26-299d32e4c146"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Delete user from oganization",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{TOKEN}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "{{BaseUrl}}/organizations/{{LoggedOrganizationForUser}}/member/c320180c-6fe5-4d55-b1a6-a39aa8bb8104",
+									"host": [
+										"{{BaseUrl}}"
+									],
+									"path": [
+										"organizations",
+										"{{LoggedOrganizationForUser}}",
+										"member",
+										"c320180c-6fe5-4d55-b1a6-a39aa8bb8104"
 									]
 								}
 							},
