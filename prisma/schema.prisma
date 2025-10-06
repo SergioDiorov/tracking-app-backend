@@ -150,8 +150,8 @@ model TaskLog {
   breakSec        Int?       //seconds
   note            String?
   mood            LogMood?
-  assignee        OrganizationMember @relation(fields: [assigneeId], references: [user])
-  assigneeId      String
+  assignee        OrganizationMember? @relation(fields: [assigneeId], references: [user], onDelete: SetNull)
+  assigneeId      String?
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
 }

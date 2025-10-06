@@ -14,7 +14,7 @@ import {
   UpdateUserFromOrganizationDto,
 } from 'src/organizations/dto/organizations.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { Prisma, WorkStatus } from '@prisma/client';
+import { Prisma, Role, WorkStatus } from '@prisma/client';
 import { formatOrganizationAnalytics } from 'src/helpers/formatOrganizationAnalytics';
 
 @Injectable()
@@ -547,18 +547,23 @@ export class OrganizationsService {
         where: { user },
       });
 
-      // Check if user is admin or owner
-      if (
-        (!member ||
-          member.organizationId !== organizationId ||
-          member.role !== 'Admin') &&
-        organization.ownerId !== user
-      ) {
+      // Check if user is member of organization
+      if (!member || member.organizationId !== organizationId) {
         throw new ForbiddenException(
-          'You have no access to delete member from this organization',
+          'You are not a member of this organization',
         );
       }
 
+      // Check if user if owner, admin or self delete
+      const isOwner = organization.ownerId === user;
+      const isAdmin = member.role === Role.Admin;
+      const isSelfDelete = user === userToDelete;
+
+      if (!(isOwner || isAdmin || isSelfDelete)) {
+        throw new ForbiddenException(
+          'You have no access to delete this member',
+        );
+      }
       // Check if user is a member of organization
       const existingMember = await this.prisma.organizationMember.findUnique({
         where: { user: userToDelete },
