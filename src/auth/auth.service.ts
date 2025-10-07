@@ -109,4 +109,32 @@ export class AuthService {
       throw new BadRequest(e.message);
     }
   }
+
+  public async refreshTokens(refreshToken: string): Promise<any> {
+    try {
+      const supabase = this.supabase.getClient();
+
+      const { data, error } = await supabase.auth.refreshSession({
+        refresh_token: refreshToken,
+      });
+
+      if (error) throw new BadRequest(error.message);
+      if (!data?.session) throw new BadRequest('Auth session missing!');
+
+      const { session } = data;
+
+      return {
+        data: {
+          access_token: session.access_token,
+          refresh_token: session.refresh_token,
+          user: {
+            id: session.user.id,
+            email: session.user.email,
+          },
+        },
+      };
+    } catch (e) {
+      throw new BadRequest(e.message);
+    }
+  }
 }

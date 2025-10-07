@@ -25,4 +25,9 @@ export class AuthController {
   ): Promise<any> {
     return this.authService.resetPassword({ dto, email: req.user.email });
   }
+
+  @Post('refresh')
+  refresh(@Body('refresh_token') refreshToken: string) {
+    return this.authService.refreshTokens(refreshToken);
+  }
 }

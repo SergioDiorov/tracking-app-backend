@@ -5,7 +5,7 @@ import { AuthGuard } from '@nestjs/passport';
 export class SupabaseGuard extends AuthGuard('jwt') {
   canActivate(context: ExecutionContext): boolean {
     const request = context.switchToHttp().getRequest();
-    const publicRoutes = ['/signUp', '/signIn'];
+    const publicRoutes = ['/signUp', '/signIn', '/refresh'];
     if (publicRoutes.includes(request.url)) {
       return true;
     }
