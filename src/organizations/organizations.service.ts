@@ -22,7 +22,7 @@ export class OrganizationsService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly supabase: Supabase,
-  ) { }
+  ) {}
 
   public async createOrganization({
     dto,
@@ -235,11 +235,13 @@ export class OrganizationsService {
 
       const profileSortFields = ['firstName', 'age', 'country'];
 
-      const orderBy = profileSortFields.includes(sortBy) ? {
-        userProfile: {
-          [sortBy]: sortOrder,
-        },
-      } : { [sortBy]: sortOrder, }
+      const orderBy = profileSortFields.includes(sortBy)
+        ? {
+            userProfile: {
+              [sortBy]: sortOrder,
+            },
+          }
+        : { [sortBy]: sortOrder };
 
       const [members, totalCount] = await this.prisma.$transaction([
         this.prisma.organizationMember.findMany({
@@ -501,9 +503,7 @@ export class OrganizationsService {
       });
 
       if (!existingMember) {
-        throw new BadRequestException(
-          'User is not a member of organization',
-        );
+        throw new BadRequestException('User is not a member of organization');
       }
 
       const updatedUser = await this.prisma.organizationMember.update({
@@ -719,7 +719,9 @@ export class OrganizationsService {
         });
 
         if (!assignee || assignee.organizationId !== organizationId) {
-          throw new BadRequestException('Invalid assignee for this organization');
+          throw new BadRequestException(
+            'Invalid assignee for this organization',
+          );
         }
       }
 
@@ -1137,7 +1139,7 @@ export class OrganizationsService {
   public async getOrganizationTasksAnalytics({
     organizationId,
     user,
-    userToSearch
+    userToSearch,
   }: {
     organizationId: string;
     user: string;

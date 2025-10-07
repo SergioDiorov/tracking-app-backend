@@ -160,23 +160,37 @@ export class GetOrganizationMembersDto extends PaginationParamsDto {
   userId?: string;
 
   @IsOptional()
-  @IsIn([
-    'joined',
-    'position',
-    'workHours',
-    'salary',
-    'type',
-    'workExperienceMonth',
-    'role',
-    'firstName',
-    'age',
-    'country',
-    'workSchedule',
-  ], {
-    message:
-      'SortBy must be one of: title, assignee, priority, deadline, createdAt',
-  })
-  sortBy?: 'joined' | 'position' | 'workHours' | 'salary' | 'type' | 'workExperienceMonth' | 'role' | 'firstName' | 'age' | 'country' | 'workSchedule';
+  @IsIn(
+    [
+      'joined',
+      'position',
+      'workHours',
+      'salary',
+      'type',
+      'workExperienceMonth',
+      'role',
+      'firstName',
+      'age',
+      'country',
+      'workSchedule',
+    ],
+    {
+      message:
+        'SortBy must be one of: title, assignee, priority, deadline, createdAt',
+    },
+  )
+  sortBy?:
+    | 'joined'
+    | 'position'
+    | 'workHours'
+    | 'salary'
+    | 'type'
+    | 'workExperienceMonth'
+    | 'role'
+    | 'firstName'
+    | 'age'
+    | 'country'
+    | 'workSchedule';
 
   @IsOptional()
   @IsIn(['asc', 'desc'], {
@@ -256,7 +270,6 @@ export class GetOrganizationTasksDto extends PaginationParamsDto {
   @IsOptional()
   @IsString({ message: 'Member ID must be a string' })
   userId?: string;
-
 
   @IsOptional()
   @IsEnum(WorkStatus, {

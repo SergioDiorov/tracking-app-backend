@@ -30,7 +30,7 @@ import {
 
 @Controller('organizations')
 export class OrganizationsController {
-  constructor(private readonly organizationsService: OrganizationsService) { }
+  constructor(private readonly organizationsService: OrganizationsService) {}
 
   // Get user organization
   @Get(':userId')
@@ -196,7 +196,6 @@ export class OrganizationsController {
     });
   }
 
-
   // Get all tasks in organization
   @Get(':organizationId/tasks')
   getOrganizationTasks(
@@ -257,7 +256,7 @@ export class OrganizationsController {
     return this.organizationsService.getOrganizationTasksAnalytics({
       organizationId,
       user: req.user.sub,
-      userToSearch: dto?.userToSearch || undefined
+      userToSearch: dto?.userToSearch || undefined,
     });
   }
 }

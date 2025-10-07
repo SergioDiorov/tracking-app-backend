@@ -11,7 +11,7 @@ import { getSecondsFromTime } from 'src/helpers/getSecondsFromDate';
 
 @Injectable()
 export class TaskLogsService {
-  constructor(private readonly prisma: PrismaService) { }
+  constructor(private readonly prisma: PrismaService) {}
 
   public async createTaskLog({
     dto,

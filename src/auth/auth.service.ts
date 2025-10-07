@@ -3,7 +3,11 @@ import { Supabase } from 'src/auth/supabase/supabase';
 import { BadRequest } from 'http-errors';
 
 import { throwError } from 'src/helpers/throwError';
-import { AuthResetPasswordDto, AuthSignInDto, AuthSignUpDto } from 'src/auth/dto/auth.dto';
+import {
+  AuthResetPasswordDto,
+  AuthSignInDto,
+  AuthSignUpDto,
+} from 'src/auth/dto/auth.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()
@@ -11,7 +15,7 @@ export class AuthService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly supabase: Supabase,
-  ) { }
+  ) {}
 
   public async signUp(dto: AuthSignUpDto): Promise<any> {
     try {
@@ -79,7 +83,13 @@ export class AuthService {
     }
   }
 
-  public async resetPassword({ dto: { oldPassword, newPassword }, email }: { dto: AuthResetPasswordDto; email: string }): Promise<any> {
+  public async resetPassword({
+    dto: { oldPassword, newPassword },
+    email,
+  }: {
+    dto: AuthResetPasswordDto;
+    email: string;
+  }): Promise<any> {
     try {
       const supabase = this.supabase.getClient();
 
@@ -98,7 +108,7 @@ export class AuthService {
 
       const { error: updateError } = await supabase.auth.updateUser({
         password: newPassword,
-      })
+      });
 
       if (updateError) {
         throw new BadRequest(updateError.message);
