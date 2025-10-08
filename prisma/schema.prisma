@@ -102,7 +102,7 @@ model OrganizationTask {
   id            String       @id @default(uuid())
   title         String
   descriptopn   String
-  assignee      String
+  assignee      String?
   priority      Priority
   deadline      DateTime
   organization  Organization @relation(fields: [organizationId], references: [id])
@@ -115,7 +115,7 @@ model OrganizationTask {
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 
-  assignedMember OrganizationMember @relation(fields: [assignee], references: [user])
+  assignedMember OrganizationMember? @relation(fields: [assignee], references: [user], onDelete: SetNull)
 
 
   TaskLog TaskLog[]
@@ -141,8 +141,8 @@ model TaskLog {
   id              String       @id @default(uuid())
   organization    Organization @relation(fields: [organizationId], references: [id])
   organizationId  String
-  task            OrganizationTask @relation(fields: [taskId], references: [id])
-  taskId          String            
+  task            OrganizationTask? @relation(fields: [taskId], references: [id], onDelete: SetNull)
+  taskId          String?            
   date            DateTime
   type            LogWorkPreference
   start           DateTime
@@ -150,8 +150,8 @@ model TaskLog {
   breakSec        Int?       //seconds
   note            String?
   mood            LogMood?
-  assignee        OrganizationMember @relation(fields: [assigneeId], references: [user])
-  assigneeId      String
+  assignee        OrganizationMember? @relation(fields: [assigneeId], references: [user], onDelete: SetNull)
+  assigneeId      String?
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
 }

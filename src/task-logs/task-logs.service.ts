@@ -241,7 +241,7 @@ export class TaskLogsService {
         throw new BadRequestException('User is not a member of organization');
       }
 
-      // Check if task existsv1
+      // Check if task exists
       const task = await this.prisma.organizationTask.findUnique({
         where: { id: existingLog.taskId },
       });

@@ -10,9 +10,11 @@ import {
   AddUserToOrganizationDto,
   CreateOrganizationDto,
   CreateOrganizationTaskDto,
+  UpdateOrganizationTaskDto,
+  UpdateUserFromOrganizationDto,
 } from 'src/organizations/dto/organizations.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { Prisma, WorkStatus } from '@prisma/client';
+import { Prisma, Role, WorkStatus } from '@prisma/client';
 import { formatOrganizationAnalytics } from 'src/helpers/formatOrganizationAnalytics';
 
 @Injectable()
@@ -20,7 +22,7 @@ export class OrganizationsService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly supabase: Supabase,
-  ) { }
+  ) {}
 
   public async createOrganization({
     dto,
@@ -154,12 +156,16 @@ export class OrganizationsService {
     page = 1,
     search = '',
     userId = null,
+    sortBy = 'joined',
+    sortOrder = 'desc',
   }: {
     organizationId: string;
     limit: number;
     page: number;
     search?: string;
     userId?: string;
+    sortBy?: string;
+    sortOrder?: string;
   }): Promise<any> {
     try {
       // Search if organization exists
@@ -205,24 +211,37 @@ export class OrganizationsService {
         ...(search && {
           userProfile: {
             is: {
-              OR: [
-                {
-                  firstName: {
-                    contains: search,
-                    mode: Prisma.QueryMode.insensitive,
+              OR: search
+                .split(' ')
+                .filter(Boolean)
+                .flatMap((item) => [
+                  {
+                    firstName: {
+                      contains: item,
+                      mode: Prisma.QueryMode.insensitive,
+                    },
                   },
-                },
-                {
-                  lastName: {
-                    contains: search,
-                    mode: Prisma.QueryMode.insensitive,
+                  {
+                    lastName: {
+                      contains: item,
+                      mode: Prisma.QueryMode.insensitive,
+                    },
                   },
-                },
-              ],
+                ]),
             },
           },
         }),
       };
+
+      const profileSortFields = ['firstName', 'age', 'country'];
+
+      const orderBy = profileSortFields.includes(sortBy)
+        ? {
+            userProfile: {
+              [sortBy]: sortOrder,
+            },
+          }
+        : { [sortBy]: sortOrder };
 
       const [members, totalCount] = await this.prisma.$transaction([
         this.prisma.organizationMember.findMany({
@@ -241,9 +260,7 @@ export class OrganizationsService {
           },
           take: limit,
           skip: skip,
-          orderBy: {
-            joined: 'desc',
-          },
+          orderBy,
         }),
         this.prisma.organizationMember.count({
           where: whereCondition,
@@ -354,7 +371,6 @@ export class OrganizationsService {
       const member = await this.prisma.organizationMember.findFirst({
         where: { organizationId: organizationId, user: userId },
       });
-      console.log(member, 'member');
 
       return {
         data: { member },
@@ -443,6 +459,146 @@ export class OrganizationsService {
     }
   }
 
+  public async updateUserFromOrganization({
+    organizationId,
+    user,
+    userToUpdate,
+    dto,
+  }: {
+    organizationId: string;
+    user: string;
+    userToUpdate: string;
+    dto: UpdateUserFromOrganizationDto;
+  }): Promise<any> {
+    try {
+      // Check if organization exists with organizationId
+      const organization = await this.prisma.organization.findUnique({
+        where: { id: organizationId },
+      });
+
+      // Check if organiaztion exists
+      if (!organization) {
+        throw new NotFoundException('Organization not found');
+      }
+
+      const member = await this.prisma.organizationMember.findUnique({
+        where: { user },
+      });
+
+      // Check if user is admin or owner
+      if (
+        (!member ||
+          member.organizationId !== organizationId ||
+          member.role !== 'Admin') &&
+        organization.ownerId !== user
+      ) {
+        throw new ForbiddenException(
+          'You have no access to update member in this organization',
+        );
+      }
+
+      // Check if user is a member of organization
+      const existingMember = await this.prisma.organizationMember.findUnique({
+        where: { user: userToUpdate },
+      });
+
+      if (!existingMember) {
+        throw new BadRequestException('User is not a member of organization');
+      }
+
+      const updatedUser = await this.prisma.organizationMember.update({
+        where: { user: userToUpdate },
+        data: dto,
+      });
+
+      return {
+        data: { updatedUser },
+        message: 'User in organization updated successfully',
+      };
+    } catch (error) {
+      throwError({
+        error,
+        customMessage: error.message,
+      });
+    }
+  }
+
+  public async deleteUserFromOrganization({
+    organizationId,
+    user,
+    userToDelete,
+  }: {
+    organizationId: string;
+    user: string;
+    userToDelete: string;
+  }): Promise<any> {
+    try {
+      // Check if organization exists with organizationId
+      const organization = await this.prisma.organization.findUnique({
+        where: { id: organizationId },
+      });
+
+      // Check if organiaztion exists
+      if (!organization) {
+        throw new NotFoundException('Organization not found');
+      }
+
+      const member = await this.prisma.organizationMember.findUnique({
+        where: { user },
+      });
+
+      // Check if user is member of organization
+      if (!member || member.organizationId !== organizationId) {
+        throw new ForbiddenException(
+          'You are not a member of this organization',
+        );
+      }
+
+      // Check if user if owner, admin or self delete
+      const isOwner = organization.ownerId === user;
+      const isAdmin = member.role === Role.Admin;
+      const isSelfDelete = user === userToDelete;
+
+      if (!(isOwner || isAdmin || isSelfDelete)) {
+        throw new ForbiddenException(
+          'You have no access to delete this member',
+        );
+      }
+      // Check if user is a member of organization
+      const existingMember = await this.prisma.organizationMember.findUnique({
+        where: { user: userToDelete },
+      });
+
+      if (!existingMember) {
+        throw new BadRequestException(
+          'User is not a member of this organization',
+        );
+      }
+
+      await this.prisma.organizationMember.delete({
+        where: { user: userToDelete },
+      });
+
+      await this.prisma.organization.update({
+        where: { id: organizationId },
+        data: {
+          membersIds: {
+            set: organization.membersIds.filter((id) => id !== userToDelete),
+          },
+        },
+      });
+
+      return {
+        message: 'User successfully deleted from organization',
+      };
+    } catch (error) {
+      throwError({
+        error,
+        customMessage: error.message,
+      });
+    }
+  }
+
   public async createOrganizationTask({
     organizationId,
     user,
@@ -481,7 +637,6 @@ export class OrganizationsService {
       const assignee = await this.prisma.organizationMember.findUnique({
         where: { user: dto.assignee },
       });
-      console.log(assignee, 'assignee');
 
       if (!assignee || assignee.organizationId !== organizationId) {
         throw new BadRequestException('Invalid assignee for this organization');
@@ -502,6 +657,143 @@ export class OrganizationsService {
       return {
         data: { task: newTask },
         message: 'Task created successfully',
+      };
+    } catch (error) {
+      throwError({
+        error,
+        customMessage: error.message,
+      });
+    }
+  }
+
+  public async updateOrganizationTask({
+    organizationId,
+    taskId,
+    user,
+    dto,
+  }: {
+    organizationId: string;
+    taskId: string;
+    user: string;
+    dto: UpdateOrganizationTaskDto;
+  }): Promise<any> {
+    try {
+      const organization = await this.prisma.organization.findUnique({
+        where: { id: organizationId },
+      });
+
+      // Check if organiaztion exists
+      if (!organization) {
+        throw new NotFoundException('Organization not found');
+      }
+
+      const task = await this.prisma.organizationTask.findUnique({
+        where: { id: taskId },
+      });
+
+      // Check if task exists
+      if (!task) {
+        throw new NotFoundException('Task not found');
+      }
+
+      const member = await this.prisma.organizationMember.findUnique({
+        where: { user },
+      });
+
+      // Check if user is admin or owner
+      if (
+        (!member ||
+          member.organizationId !== organizationId ||
+          member.role !== 'Admin') &&
+        organization.ownerId !== user
+      ) {
+        throw new ForbiddenException(
+          'You have no access to update tasks in this organization',
+        );
+      }
+
+      // Check if assigned user is from organization
+      if (dto.assignee) {
+        const assignee = await this.prisma.organizationMember.findUnique({
+          where: { user: dto.assignee },
+        });
+
+        if (!assignee || assignee.organizationId !== organizationId) {
+          throw new BadRequestException(
+            'Invalid assignee for this organization',
+          );
+        }
+      }
+
+      // update task
+      const updatedTask = await this.prisma.organizationTask.update({
+        where: { id: taskId },
+        data: dto,
+      });
+
+      return {
+        data: { task: updatedTask },
+        message: 'Task updated successfully',
+      };
+    } catch (error) {
+      throwError({
+        error,
+        customMessage: error.message,
+      });
+    }
+  }
+
+  public async deleteOrganizationTask({
+    organizationId,
+    taskId,
+    user,
+  }: {
+    organizationId: string;
+    taskId: string;
+    user: string;
+  }): Promise<any> {
+    try {
+      const organization = await this.prisma.organization.findUnique({
+        where: { id: organizationId },
+      });
+
+      // Check if organiaztion exists
+      if (!organization) {
+        throw new NotFoundException('Organization not found');
+      }
+
+      const task = await this.prisma.organizationTask.findUnique({
+        where: { id: taskId },
+      });
+
+      // Check if task exists
+      if (!task) {
+        throw new NotFoundException('Task not found');
+      }
+
+      const member = await this.prisma.organizationMember.findUnique({
+        where: { user },
+      });
+
+      // Check if user is admin or owner
+      if (
+        (!member ||
+          member.organizationId !== organizationId ||
+          member.role !== 'Admin') &&
+        organization.ownerId !== user
+      ) {
+        throw new ForbiddenException(
+          'You have no access to delete tasks in this organization',
+        );
+      }
+
+      // delete task
+      await this.prisma.organizationTask.delete({
+        where: { id: taskId },
+      });
+
+      return {
+        message: 'Task deleted successfully',
       };
     } catch (error) {
       throwError({
@@ -847,9 +1139,11 @@ export class OrganizationsService {
   public async getOrganizationTasksAnalytics({
     organizationId,
     user,
+    userToSearch,
   }: {
     organizationId: string;
     user: string;
+    userToSearch?: string;
   }): Promise<any> {
     try {
       const organization = await this.prisma.organization.findUnique({
@@ -882,7 +1176,10 @@ export class OrganizationsService {
 
       // Get all organization tasks with: loggedTimeSec | priority | workStatus
       const allTasks = await this.prisma.organizationTask.findMany({
-        where: { organizationId },
+        where: {
+          organizationId,
+          ...(userToSearch !== undefined && { assignee: userToSearch }),
+        },
         select: {
           loggedTimeSec: true,
           finishedAt: true,

@@ -1,3 +1,4 @@
+import { Optional } from '@nestjs/common';
 import { Position, Priority, Role, Type, WorkStatus } from '@prisma/client';
 import { Transform } from 'class-transformer';
 import {
@@ -101,6 +102,53 @@ export class AddUserToOrganizationDto {
   role: Role;
 }
 
+export class UpdateUserFromOrganizationDto {
+  @Optional()
+  @IsString({ message: 'Email must be a string' })
+  @IsEmail({}, { message: 'Email must be a valid email address' })
+  email?: string;
+
+  @Optional()
+  @IsString({ message: 'Position must be a string' })
+  @IsIn(Object.values(Position), {
+    message: `Position must be one of the following: ${Object.values(Position).join(', ')}`,
+  })
+  position?: Position;
+
+  @Optional()
+  @IsString({ message: 'Work schedule must be a string' })
+  workSchedule?: string;
+
+  @Optional()
+  @IsInt({ message: 'Work hours must be an integer' })
+  @IsPositive({ message: 'Work hours must be a positive number' })
+  workHours?: number;
+
+  @Optional()
+  @IsInt({ message: 'Salary must be an integer' })
+  @IsPositive({ message: 'Salary must be a positive number' })
+  salary?: number;
+
+  @Optional()
+  @IsString({ message: 'Type must be a string' })
+  @IsIn(Object.values(Type), {
+    message: `Type must be one of the following: ${Object.values(Type).join(', ')}`,
+  })
+  type?: Type;
+
+  @Optional()
+  @IsInt({ message: 'Work experience in months must be an integer' })
+  @IsPositive({ message: 'Work experience must be a positive number' })
+  workExperienceMonth?: number;
+
+  @Optional()
+  @IsString({ message: 'Role must be a string' })
+  @IsIn(Object.values(Role), {
+    message: `Role must be one of the following: ${Object.values(Role).join(', ')}`,
+  })
+  role?: Role;
+}
+
 export class GetOrganizationMembersDto extends PaginationParamsDto {
   @IsOptional()
   @IsString({ message: 'Search must be a string' })
@@ -110,6 +158,46 @@ export class GetOrganizationMembersDto extends PaginationParamsDto {
   @IsOptional()
   @IsString({ message: 'Member ID must be a string' })
   userId?: string;
+
+  @IsOptional()
+  @IsIn(
+    [
+      'joined',
+      'position',
+      'workHours',
+      'salary',
+      'type',
+      'workExperienceMonth',
+      'role',
+      'firstName',
+      'age',
+      'country',
+      'workSchedule',
+    ],
+    {
+      message:
+        'SortBy must be one of: title, assignee, priority, deadline, createdAt',
+    },
+  )
+  sortBy?:
+    | 'joined'
+    | 'position'
+    | 'workHours'
+    | 'salary'
+    | 'type'
+    | 'workExperienceMonth'
+    | 'role'
+    | 'firstName'
+    | 'age'
+    | 'country'
+    | 'workSchedule';
+
+  @IsOptional()
+  @IsIn(['asc', 'desc'], {
+    message: 'Sort order must be either "asc" or "desc"',
+  })
+  @Transform(({ value }) => value?.toLowerCase())
+  sortOrder?: 'asc' | 'desc';
 }
 
 export class CreateOrganizationTaskDto {
@@ -138,6 +226,32 @@ export class CreateOrganizationTaskDto {
   deadline: Date;
 }
 
+export class UpdateOrganizationTaskDto {
+  @IsString({ message: 'Title must be a string' })
+  @MaxLength(100, { message: 'Title is too long' })
+  @Optional()
+  title?: string;
+
+  @Optional()
+  @IsString({ message: 'Description must be a string' })
+  @MaxLength(1000, { message: 'Description is too long' })
+  descriptopn?: string;
+
+  @Optional()
+  @IsString({ message: 'Assignee ID must be a string' })
+  assignee?: string;
+
+  @Optional()
+  @IsEnum(Priority, {
+    message: `Priority must be one of the following: ${Object.values(Priority).join(', ')}`,
+  })
+  priority?: Priority;
+
+  @Optional()
+  @IsDateString({}, { message: 'Deadline must be a valid ISO date string' })
+  deadline?: Date;
+}
+
 export class GetOrganizationTasksDto extends PaginationParamsDto {
   @IsOptional()
   @IsIn(['title', 'assignee', 'priority', 'deadline', 'createdAt'], {
@@ -156,7 +270,6 @@ export class GetOrganizationTasksDto extends PaginationParamsDto {
   @IsOptional()
   @IsString({ message: 'Member ID must be a string' })
   userId?: string;
-
 
   @IsOptional()
   @IsEnum(WorkStatus, {
@@ -177,4 +290,10 @@ export class GetOrganizationTasksProgress {
   @IsOptional()
   @IsString({ message: 'Member ID must be a string' })
   userId?: string;
+}
+
+export class GetOrganizationTasksAnalytics {
+  @IsOptional()
+  @IsString({ message: 'Member ID must be a string' })
+  userToSearch?: string;
 }

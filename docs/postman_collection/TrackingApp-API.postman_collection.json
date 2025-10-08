@@ -74,6 +74,42 @@
 						}
 					},
 					"response": []
+				},
+				{
+					"name": "Reset password",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{TOKEN}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"oldPassword\": \"old-password\",\r\n    \"newPassword\": \"new-password\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{BaseUrl}}/reset-password",
+							"host": [
+								"{{BaseUrl}}"
+							],
+							"path": [
+								"reset-password"
+							]
+						}
+					},
+					"response": []
 				}
 			]
 		},
@@ -128,6 +164,12 @@
 									"key": "userId",
 									"value": "{{LoggedUserId}}",
 									"description": "98f9e127-0e41-455e-8c26-299d32e4c146"
+								},
+								{
+									"key": "filterByWorkStatus",
+									"value": "TODO",
+									"description": "TODO | BLOCKED | INPROGRESS | PUSHED | DONE",
+									"disabled": true
 								}
 							]
 						}
@@ -135,7 +177,7 @@
 					"response": []
 				},
 				{
-					"name": "Add task to user from oganization Copy",
+					"name": "Add task",
 					"request": {
 						"auth": {
 							"type": "bearer",
@@ -168,6 +210,76 @@
 								"3c8b5cf6-c56a-40c1-8e4a-b1aff9bfbd35",
 								"tasks",
 								"create"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update task",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{TOKEN}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"title\": \"1A Test task name 3 edit 1234\",\r\n  \"workStatus\": \"TODO\",\r\n  \"descriptopn\": \"Test description text for test task\",\r\n  \"assignee\": \"044c719c-2dae-4ab3-82bb-0d067911529b\",\r\n  \"priority\": \"LOW\",\r\n  \"deadline\": \"2024-10-22T00:00:00.000Z\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{BaseUrl}}/organizations/{{LoggedOrganizationForUser}}/tasks/update/0c8de6a2-d55b-45ca-8af0-bd597b15d36e",
+							"host": [
+								"{{BaseUrl}}"
+							],
+							"path": [
+								"organizations",
+								"{{LoggedOrganizationForUser}}",
+								"tasks",
+								"update",
+								"0c8de6a2-d55b-45ca-8af0-bd597b15d36e"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete task",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{TOKEN}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{BaseUrl}}/organizations/{{LoggedOrganizationForUser}}/tasks/a8450722-b084-4e3d-8b7a-bf6aa5ca3855",
+							"host": [
+								"{{BaseUrl}}"
+							],
+							"path": [
+								"organizations",
+								"{{LoggedOrganizationForUser}}",
+								"tasks",
+								"a8450722-b084-4e3d-8b7a-bf6aa5ca3855"
 							]
 						}
 					},
@@ -313,7 +425,7 @@
 									"formdata": []
 								},
 								"url": {
-									"raw": "{{BaseUrl}}/organizations/{{LoggedOrganizationForUser}}/analytics/tasks",
+									"raw": "{{BaseUrl}}/organizations/{{LoggedOrganizationForUser}}/analytics/tasks?userToSearch={{LoggedUserId}}",
 									"host": [
 										"{{BaseUrl}}"
 									],
@@ -322,6 +434,12 @@
 										"{{LoggedOrganizationForUser}}",
 										"analytics",
 										"tasks"
+									],
+									"query": [
+										{
+											"key": "userToSearch",
+											"value": "{{LoggedUserId}}"
+										}
 									]
 								}
 							},
@@ -359,6 +477,118 @@
 										"{{LoggedOrganizationForUser}}",
 										"analytics",
 										"employers"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Member",
+					"item": [
+						{
+							"name": "Add user to oganization",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{TOKEN}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"email\": \"testOne@gmail.com\",\r\n    \"position\": \"ITManager\",\r\n    \"workSchedule\": \"5/2\",\r\n    \"type\": \"Contractor\",\r\n    \"role\": \"Admin\",\r\n    \"workHours\": 8,\r\n    \"salary\": 1500,\r\n    \"workExperienceMonth\": 24\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{BaseUrl}}/organizations/{{LoggedOrganizationForUser}}/add",
+									"host": [
+										"{{BaseUrl}}"
+									],
+									"path": [
+										"organizations",
+										"{{LoggedOrganizationForUser}}",
+										"add"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Update user from oganization",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{TOKEN}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "PATCH",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"position\": \"SalesManager\"\r\n    // \"workSchedule\": \"8/2\"\r\n    // \"type\": \"Contractor\"\r\n    // \"role\": \"Admin\"\r\n    // \"workHours\": 40\r\n    // \"salary\": 3200\r\n    // \"workExperienceMonth\": 36\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{BaseUrl}}/organizations/{{LoggedOrganizationForUser}}/member/98f9e127-0e41-455e-8c26-299d32e4c146",
+									"host": [
+										"{{BaseUrl}}"
+									],
+									"path": [
+										"organizations",
+										"{{LoggedOrganizationForUser}}",
+										"member",
+										"98f9e127-0e41-455e-8c26-299d32e4c146"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Delete user from oganization",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{TOKEN}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "{{BaseUrl}}/organizations/{{LoggedOrganizationForUser}}/member/c320180c-6fe5-4d55-b1a6-a39aa8bb8104",
+									"host": [
+										"{{BaseUrl}}"
+									],
+									"path": [
+										"organizations",
+										"{{LoggedOrganizationForUser}}",
+										"member",
+										"c320180c-6fe5-4d55-b1a6-a39aa8bb8104"
 									]
 								}
 							},
@@ -436,44 +666,6 @@
 					"response": []
 				},
 				{
-					"name": "Add user to oganization",
-					"request": {
-						"auth": {
-							"type": "bearer",
-							"bearer": [
-								{
-									"key": "token",
-									"value": "{{TOKEN}}",
-									"type": "string"
-								}
-							]
-						},
-						"method": "POST",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "{\r\n    \"email\": \"testOne@gmail.com\",\r\n    \"position\": \"ITManager\",\r\n    \"workSchedule\": \"5/2\",\r\n    \"type\": \"Contractor\",\r\n    \"role\": \"Admin\",\r\n    \"workHours\": 8,\r\n    \"salary\": 1500,\r\n    \"workExperienceMonth\": 24\r\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "{{BaseUrl}}/organizations/{{LoggedOrganizationForUser}}/add",
-							"host": [
-								"{{BaseUrl}}"
-							],
-							"path": [
-								"organizations",
-								"{{LoggedOrganizationForUser}}",
-								"add"
-							]
-						}
-					},
-					"response": []
-				},
-				{
 					"name": "Get user organization",
 					"event": [
 						{
@@ -544,7 +736,7 @@
 							"formdata": []
 						},
 						"url": {
-							"raw": "{{BaseUrl}}/organizations/members/{{LoggedOrganizationForUser}}",
+							"raw": "{{BaseUrl}}/organizations/members/{{LoggedOrganizationForUser}}?page=1&limit=10&search=test&sortBy=joined&sortOrder=desc",
 							"host": [
 								"{{BaseUrl}}"
 							],
@@ -552,6 +744,39 @@
 								"organizations",
 								"members",
 								"{{LoggedOrganizationForUser}}"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "1",
+									"description": "Response page"
+								},
+								{
+									"key": "limit",
+									"value": "10",
+									"description": "Response items size"
+								},
+								{
+									"key": "search",
+									"value": "test",
+									"description": "Search member by name"
+								},
+								{
+									"key": "userId",
+									"value": "{{LoggedUserId}}",
+									"description": "Search member by userId",
+									"disabled": true
+								},
+								{
+									"key": "sortBy",
+									"value": "joined",
+									"description": "'joined' | 'position' | 'workHours' | 'salary' | 'type' | 'workExperienceMonth' | 'role' | 'firstName' | 'age' | 'country'"
+								},
+								{
+									"key": "sortOrder",
+									"value": "desc",
+									"description": "'asc' | 'desc'"
+								}
 							]
 						}
 					},
