@@ -9,7 +9,7 @@ export class UsersService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly supabase: Supabase,
-  ) { }
+  ) {}
 
   public async getUserProfile(userId: string): Promise<any> {
     try {

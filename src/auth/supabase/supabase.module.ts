@@ -10,4 +10,4 @@ import { Supabase } from '../../auth/supabase/supabase';
   providers: [Supabase, SupabaseStrategy, SupabaseGuard],
   exports: [Supabase, SupabaseStrategy, SupabaseGuard],
 })
-export class SupabaseModule { }
+export class SupabaseModule {}

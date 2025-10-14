@@ -10,4 +10,4 @@ import { SupabaseModule } from '../auth/supabase/supabase.module';
   controllers: [TaskLogsController],
   providers: [TaskLogsService, PrismaService],
 })
-export class TaskLogsModule { }
+export class TaskLogsModule {}

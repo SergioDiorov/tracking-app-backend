@@ -52,4 +52,4 @@ export class CreateTaskLogDto {
   mood?: LogMood;
 }
 
-export class GetUserLogsDto extends PaginationParamsDto { }
+export class GetUserLogsDto extends PaginationParamsDto {}

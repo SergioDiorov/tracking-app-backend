@@ -10,7 +10,7 @@ import { AuthModule } from '../src/auth/auth.module';
 import { UsersModule } from '../src/users/users.module';
 import { OrganizationsModule } from '../src/organizations/organizations.module';
 import { TaskLogsModule } from '../src/task-logs/task-logs.module';
-import { AppController } from '../src/app.controller'
+import { AppController } from '../src/app.controller';
 
 @Module({
   imports: [
@@ -35,4 +35,4 @@ import { AppController } from '../src/app.controller'
     PrismaService,
   ],
 })
-export class AppModule { }
+export class AppModule {}

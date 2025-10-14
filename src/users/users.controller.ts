@@ -19,7 +19,7 @@ import { ProfilePatchDataDto } from '../users/dto/users.dto';
 
 @Controller('users')
 export class UsersController {
-  constructor(private readonly usersService: UsersService) { }
+  constructor(private readonly usersService: UsersService) {}
 
   @Get(':userId')
   getUserProfile(@Param('userId') userId: string): Promise<any> {

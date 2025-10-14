@@ -10,4 +10,4 @@ import { SupabaseModule } from '../auth/supabase/supabase.module';
   controllers: [OrganizationsController],
   providers: [OrganizationsService, PrismaService],
 })
-export class OrganizationsModule { }
+export class OrganizationsModule {}

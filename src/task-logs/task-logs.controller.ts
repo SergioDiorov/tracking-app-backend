@@ -10,11 +10,14 @@ import {
   Request,
 } from '@nestjs/common';
 import { TaskLogsService } from '../task-logs/task-logs.service';
-import { CreateTaskLogDto, GetUserLogsDto } from '../task-logs/dto/task-logs.dto';
+import {
+  CreateTaskLogDto,
+  GetUserLogsDto,
+} from '../task-logs/dto/task-logs.dto';
 
 @Controller('task-logs')
 export class TaskLogsController {
-  constructor(private readonly taskLogsService: TaskLogsService) { }
+  constructor(private readonly taskLogsService: TaskLogsService) {}
 
   // Add task log
   @Post('')

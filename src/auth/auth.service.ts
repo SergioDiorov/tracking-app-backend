@@ -15,7 +15,7 @@ export class AuthService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly supabase: Supabase,
-  ) { }
+  ) {}
 
   public async signUp(dto: AuthSignUpDto): Promise<any> {
     try {

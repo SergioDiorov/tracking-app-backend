@@ -22,7 +22,7 @@ export class OrganizationsService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly supabase: Supabase,
-  ) { }
+  ) {}
 
   public async createOrganization({
     dto,
@@ -237,10 +237,10 @@ export class OrganizationsService {
 
       const orderBy = profileSortFields.includes(sortBy)
         ? {
-          userProfile: {
-            [sortBy]: sortOrder,
-          },
-        }
+            userProfile: {
+              [sortBy]: sortOrder,
+            },
+          }
         : { [sortBy]: sortOrder };
 
       const [members, totalCount] = await this.prisma.$transaction([
