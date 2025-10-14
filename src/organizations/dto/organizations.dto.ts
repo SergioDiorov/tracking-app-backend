@@ -16,9 +16,9 @@ import {
   IsDateString,
 } from 'class-validator';
 
-import { lettersAndSpacesRegex } from 'src/helpers/regex';
-import { PaginationParamsDto } from 'src/interfaces/dto';
-import { industry, IndustryType } from 'src/interfaces/organization';
+import { lettersAndSpacesRegex } from '../../helpers/regex';
+import { PaginationParamsDto } from '../../interfaces/dto';
+import { industry, IndustryType } from '../../interfaces/organization';
 
 export class CreateOrganizationDto {
   @IsString({ message: 'Name must be a string' })

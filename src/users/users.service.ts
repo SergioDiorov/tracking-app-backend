@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common';
 
-import { PrismaService } from 'src/prisma/prisma.service';
-import { Supabase } from 'src/auth/supabase/supabase';
-import { ProfilePatchDataDto } from 'src/users/dto/users.dto';
+import { PrismaService } from '../prisma/prisma.service';
+import { Supabase } from '../auth/supabase/supabase';
+import { ProfilePatchDataDto } from '../users/dto/users.dto';
 
 @Injectable()
 export class UsersService {

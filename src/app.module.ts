@@ -3,13 +3,14 @@ import { PassportModule } from '@nestjs/passport';
 import { APP_PIPE, APP_GUARD } from '@nestjs/core';
 import { ConfigModule } from '@nestjs/config';
 
-import { SupabaseGuard } from 'src/auth/supabase/supabase.guard';
-import { PrismaService } from 'src/prisma/prisma.service';
-import { SupabaseModule } from 'src/auth/supabase/supabase.module';
-import { AuthModule } from 'src/auth/auth.module';
-import { UsersModule } from 'src/users/users.module';
-import { OrganizationsModule } from './organizations/organizations.module';
-import { TaskLogsModule } from './task-logs/task-logs.module';
+import { SupabaseGuard } from '../src/auth/supabase/supabase.guard';
+import { PrismaService } from '../src/prisma/prisma.service';
+import { SupabaseModule } from '../src/auth/supabase/supabase.module';
+import { AuthModule } from '../src/auth/auth.module';
+import { UsersModule } from '../src/users/users.module';
+import { OrganizationsModule } from '../src/organizations/organizations.module';
+import { TaskLogsModule } from '../src/task-logs/task-logs.module';
+import { AppController } from '../src/app.controller';
 
 @Module({
   imports: [
@@ -21,6 +22,7 @@ import { TaskLogsModule } from './task-logs/task-logs.module';
     OrganizationsModule,
     TaskLogsModule,
   ],
+  controllers: [AppController],
   providers: [
     {
       provide: APP_PIPE,

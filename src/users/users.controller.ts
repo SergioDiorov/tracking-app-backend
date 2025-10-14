@@ -14,8 +14,8 @@ import {
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 
-import { UsersService } from 'src/users/users.service';
-import { ProfilePatchDataDto } from 'src/users/dto/users.dto';
+import { UsersService } from '../users/users.service';
+import { ProfilePatchDataDto } from '../users/dto/users.dto';
 
 @Controller('users')
 export class UsersController {

@@ -15,7 +15,7 @@ import {
   UseInterceptors,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { OrganizationsService } from 'src/organizations/organizations.service';
+import { OrganizationsService } from '../organizations/organizations.service';
 import {
   AddUserToOrganizationDto,
   CreateOrganizationDto,
@@ -26,7 +26,7 @@ import {
   GetOrganizationTasksProgress,
   UpdateOrganizationTaskDto,
   UpdateUserFromOrganizationDto,
-} from 'src/organizations/dto/organizations.dto';
+} from '../organizations/dto/organizations.dto';
 
 @Controller('organizations')
 export class OrganizationsController {

@@ -1,9 +1,9 @@
 import { Module } from '@nestjs/common';
 
-import { OrganizationsService } from './organizations.service';
-import { OrganizationsController } from './organizations.controller';
-import { PrismaService } from 'src/prisma/prisma.service';
-import { SupabaseModule } from 'src/auth/supabase/supabase.module';
+import { OrganizationsService } from '../organizations/organizations.service';
+import { OrganizationsController } from '../organizations/organizations.controller';
+import { PrismaService } from '../prisma/prisma.service';
+import { SupabaseModule } from '../auth/supabase/supabase.module';
 
 @Module({
   imports: [SupabaseModule],
