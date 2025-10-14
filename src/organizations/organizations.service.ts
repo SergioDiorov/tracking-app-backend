@@ -4,25 +4,25 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { Supabase } from 'src/auth/supabase/supabase';
-import { throwError } from 'src/helpers/throwError';
+import { Supabase } from '../auth/supabase/supabase';
+import { throwError } from '../helpers/throwError';
 import {
   AddUserToOrganizationDto,
   CreateOrganizationDto,
   CreateOrganizationTaskDto,
   UpdateOrganizationTaskDto,
   UpdateUserFromOrganizationDto,
-} from 'src/organizations/dto/organizations.dto';
-import { PrismaService } from 'src/prisma/prisma.service';
+} from '../organizations/dto/organizations.dto';
+import { PrismaService } from '../prisma/prisma.service';
 import { Prisma, Role, WorkStatus } from '@prisma/client';
-import { formatOrganizationAnalytics } from 'src/helpers/formatOrganizationAnalytics';
+import { formatOrganizationAnalytics } from '../helpers/formatOrganizationAnalytics';
 
 @Injectable()
 export class OrganizationsService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly supabase: Supabase,
-  ) {}
+  ) { }
 
   public async createOrganization({
     dto,
@@ -237,10 +237,10 @@ export class OrganizationsService {
 
       const orderBy = profileSortFields.includes(sortBy)
         ? {
-            userProfile: {
-              [sortBy]: sortOrder,
-            },
-          }
+          userProfile: {
+            [sortBy]: sortOrder,
+          },
+        }
         : { [sortBy]: sortOrder };
 
       const [members, totalCount] = await this.prisma.$transaction([

@@ -3,15 +3,15 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { PrismaService } from 'src/prisma/prisma.service';
-import { CreateTaskLogDto, GetUserLogsDto } from './dto/task-logs.dto';
-import { throwError } from 'src/helpers/throwError';
+import { PrismaService } from '../prisma/prisma.service';
+import { CreateTaskLogDto, GetUserLogsDto } from '../task-logs/dto/task-logs.dto';
+import { throwError } from '../helpers/throwError';
 import { TaskLog, WorkStatus } from '@prisma/client';
-import { getSecondsFromTime } from 'src/helpers/getSecondsFromDate';
+import { getSecondsFromTime } from '../helpers/getSecondsFromDate';
 
 @Injectable()
 export class TaskLogsService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(private readonly prisma: PrismaService) { }
 
   public async createTaskLog({
     dto,

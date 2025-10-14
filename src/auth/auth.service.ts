@@ -1,21 +1,21 @@
 import { Injectable } from '@nestjs/common';
-import { Supabase } from 'src/auth/supabase/supabase';
+import { Supabase } from '../auth/supabase/supabase';
 import { BadRequest } from 'http-errors';
 
-import { throwError } from 'src/helpers/throwError';
+import { throwError } from '../helpers/throwError';
 import {
   AuthResetPasswordDto,
   AuthSignInDto,
   AuthSignUpDto,
-} from 'src/auth/dto/auth.dto';
-import { PrismaService } from 'src/prisma/prisma.service';
+} from '../auth/dto/auth.dto';
+import { PrismaService } from '../prisma/prisma.service';
 
 @Injectable()
 export class AuthService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly supabase: Supabase,
-  ) {}
+  ) { }
 
   public async signUp(dto: AuthSignUpDto): Promise<any> {
     try {

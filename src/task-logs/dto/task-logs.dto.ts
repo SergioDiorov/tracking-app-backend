@@ -7,7 +7,7 @@ import {
   IsOptional,
   IsString,
 } from 'class-validator';
-import { PaginationParamsDto } from 'src/interfaces/dto';
+import { PaginationParamsDto } from '../../interfaces/dto';
 
 export class CreateTaskLogDto {
   @IsString({ message: 'Organization ID must be a string' })
@@ -52,4 +52,4 @@ export class CreateTaskLogDto {
   mood?: LogMood;
 }
 
-export class GetUserLogsDto extends PaginationParamsDto {}
+export class GetUserLogsDto extends PaginationParamsDto { }
